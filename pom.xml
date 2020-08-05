@@ -9,6 +9,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <build>
+        <finalName>${project.name}-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -23,6 +24,35 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <minimizeJar>true</minimizeJar>
+                            <!--                            <finalName>twill-${project.version}-shaded</finalName>-->
+                            <artifactSet>
+                                <includes>
+                                    <include>com.github.Travja:TravjaUtils</include>
+                                    <!--                                    <include>net.sf.trove4j</include>-->
+                                </includes>
+                            </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>me.travja.utils</pattern>
+                                    <shadedPattern>edu.neumont.chessmasters.utils</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -40,6 +70,13 @@
             <groupId>com.github.Travja</groupId>
             <artifactId>TravjaUtils</artifactId>
             <version>v1.0.03</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.2.4</version>
+            <type>maven-plugin</type>
         </dependency>
 
         <!-- JUnit Libraries in case we decide to do Unit Tests -->
