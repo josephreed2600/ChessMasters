@@ -1,16 +1,23 @@
 package edu.neumont.chessmasters.models.pieces;
 
+import edu.neumont.chessmasters.Utils;
 import edu.neumont.chessmasters.models.Location;
 
 public abstract class Piece {
 
     protected final PieceColor color;
+		protected final String notation;
 
     protected int numMoves = 0;
     protected Location location;
 
-    public Piece(PieceColor color) {
+    public Piece(PieceColor color, String notation) {
         this.color = color;
+				this.notation = notation;
+    }
+
+    public Piece(PieceColor color) {
+			this(color, "?");
     }
 
     public PieceColor getColor() {
@@ -55,5 +62,13 @@ public abstract class Piece {
     }
 
     public abstract boolean validateMove(String move);
+
+		@Override
+		public String toString() {
+			return getColor() == PieceColor.WHITE
+				? Utils.Styles.lightPiece + this.notation.toUpperCase() + Utils.Styles.afterPiece
+				: Utils.Styles.darkPiece  + this.notation.toLowerCase() + Utils.Styles.afterPiece
+				;
+		}
 
 }

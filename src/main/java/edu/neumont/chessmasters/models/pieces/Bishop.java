@@ -4,7 +4,7 @@ import edu.neumont.chessmasters.models.Location;
 
 public class Bishop extends Piece {
     public Bishop(PieceColor color) {
-        super(color);
+        super(color, "b");
     }
 
     @Override

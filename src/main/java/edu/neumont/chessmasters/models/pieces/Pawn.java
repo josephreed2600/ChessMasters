@@ -5,7 +5,7 @@ import edu.neumont.chessmasters.models.Location;
 public class Pawn extends Piece {
 
     public Pawn(PieceColor color) {
-        super(color);
+        super(color, "p");
     }
 
     @Override

@@ -4,7 +4,7 @@ import edu.neumont.chessmasters.models.Location;
 
 public class Rook extends Piece {
     public Rook(PieceColor color) {
-        super(color);
+        super(color, "r");
     }
 
     @Override

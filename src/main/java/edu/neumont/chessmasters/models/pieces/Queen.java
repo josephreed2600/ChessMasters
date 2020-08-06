@@ -4,7 +4,7 @@ import edu.neumont.chessmasters.models.Location;
 
 public class Queen extends Piece {
     public Queen(PieceColor color) {
-        super(color);
+        super(color, "q");
     }
 
     @Override
