@@ -9,6 +9,7 @@ public class Rook extends Piece {
 
     @Override
     public boolean validateMove(String move) {
+        move = move.toLowerCase();
         int dx = Math.abs(getLocation().getX() - Location.getX(move));
         int dy = Math.abs(getLocation().getY() - Location.getY(move));
         return (dx == 0 && dy > 0) || (dy == 0 && dx > 0);

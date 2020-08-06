@@ -45,6 +45,7 @@ public abstract class Piece {
      * @return boolean - Whether or not the move has been made.
      */
     public boolean move(String location) {
+        location = location.toLowerCase();
         if (this.getLocation() != null && !validateMove(location))
             return false;
 

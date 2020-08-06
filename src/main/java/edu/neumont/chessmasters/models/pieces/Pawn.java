@@ -10,6 +10,7 @@ public class Pawn extends Piece {
 
     @Override
     public boolean validateMove(String move) {
+        move = move.toLowerCase();
         boolean canMove = false;
 
         int y = getLocation().getY();

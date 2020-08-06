@@ -5,6 +5,7 @@ public class Location {
     private int x = 0, y = 0;
 
     public Location(String coordinates) {
+        coordinates = coordinates.toLowerCase();
         setX(getX(coordinates));
         setY(getY(coordinates));
     }
@@ -19,7 +20,7 @@ public class Location {
     }
 
     public void setX(int x) {
-        if(x > 7 || x < 0)
+        if (x > 7 || x < 0)
             throw new IndexOutOfBoundsException("Cannot set piece's location beyond 7 or less than 0");
         this.x = x;
     }
@@ -29,16 +30,18 @@ public class Location {
     }
 
     public void setY(int y) {
-        if(y > 7 || y < 0)
+        if (y > 7 || y < 0)
             throw new IndexOutOfBoundsException("Cannot set piece's location beyond 7 or less than 0");
         this.y = y;
     }
 
     public static int getY(String location) {
+        location = location.toLowerCase();
         return Integer.valueOf(location.substring(1)) - 1;
     }
 
     public static int getX(String location) {
+        location = location.toLowerCase();
         char c = location.charAt(0);
         return Integer.valueOf(c) - Integer.valueOf('a');
     }
