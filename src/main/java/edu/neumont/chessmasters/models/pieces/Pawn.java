@@ -18,7 +18,7 @@ public class Pawn extends Piece {
                 (getColor() == PieceColor.BLACK && newY < y)) {
             int dx = Math.abs(getLocation().getX() - Location.getX(move));
             int dy = Math.abs(y - newY);
-            canMove = (dx <= 1 && dy <= 1) || (dx == 0 && dy <= 2);
+            canMove = (dx <= 1 && dy <= 1) || (numMoves == 0 && dx == 0 && dy <= 2);
         }
 
         return canMove;

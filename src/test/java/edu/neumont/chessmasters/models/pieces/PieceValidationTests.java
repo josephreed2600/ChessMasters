@@ -4,61 +4,61 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class PieceTest {
+class PieceValidationTests {
 
     @Test
-    void testPawnMovement() {
-        System.out.println("\nTesting Pawn movement");
+    void testPawnvalidation() {
+        System.out.println("\nTesting Pawn validation");
         Pawn wpawn = new Pawn(PieceColor.WHITE);
         wpawn.setLocation("b2");
-        System.out.println("Testing white pawn moving from b2 to b3");
+        System.out.println("Testing white pawn validation from b2 to b3");
         assert (wpawn.validateMove("b3"));
         System.out.println("Correct. Valid move.\n");
 
-        System.out.println("Testing white pawn moving from b2 to b4");
+        System.out.println("Testing white pawn validation from b2 to b4");
         assert (wpawn.validateMove("b4"));
         System.out.println("Correct. Valid move.\n");
 
-        System.out.println("Testing white pawn moving from b2 to c3");
+        System.out.println("Testing white pawn validation from b2 to c3");
         assert (wpawn.validateMove("c3"));
         System.out.println("Correct. Valid move.\n");
 
-        System.out.println("Testing white pawn moving from b2 to c4");
+        System.out.println("Testing white pawn validation from b2 to c4");
         assertFalse(wpawn.validateMove("c4"));
         System.out.println("Correct. Invalid move.\n");
 
-        System.out.println("Testing white pawn moving from b2 to b5");
+        System.out.println("Testing white pawn validation from b2 to b5");
         assertFalse(wpawn.validateMove("b5"));
         System.out.println("Correct. Invalid move.\n");
 
-        System.out.println("Testing white pawn moving from b2 to b1");
+        System.out.println("Testing white pawn validation from b2 to b1");
         assertFalse(wpawn.validateMove("b1"));
         System.out.println("Correct. Invalid move.\n");
 
 
         Pawn bpawn = new Pawn(PieceColor.BLACK);
         bpawn.setLocation("b7");
-        System.out.println("Testing black pawn moving from b7 to b6");
+        System.out.println("Testing black pawn validation from b7 to b6");
         assert (bpawn.validateMove("b6"));
         System.out.println("Correct. Valid move.\n");
 
-        System.out.println("Testing black pawn moving from b7 to b5");
+        System.out.println("Testing black pawn validation from b7 to b5");
         assert (bpawn.validateMove("b5"));
         System.out.println("Correct. Valid move.\n");
 
-        System.out.println("Testing black pawn moving from b7 to c6");
+        System.out.println("Testing black pawn validation from b7 to c6");
         assert (bpawn.validateMove("c6"));
         System.out.println("Correct. Valid move.\n");
 
-        System.out.println("Testing black pawn moving from b7 to c5");
+        System.out.println("Testing black pawn validation from b7 to c5");
         assertFalse(bpawn.validateMove("c5"));
         System.out.println("Correct. Invalid move.\n");
 
-        System.out.println("Testing black pawn moving from b7 to b4");
+        System.out.println("Testing black pawn validation from b7 to b4");
         assertFalse(bpawn.validateMove("b4"));
         System.out.println("Correct. Invalid move.\n");
 
-        System.out.println("Testing black pawn moving from b7 to b8");
+        System.out.println("Testing black pawn validation from b7 to b8");
         assertFalse(bpawn.validateMove("b8"));
         System.out.println("Correct. Invalid move.\n");
     }
@@ -84,7 +84,7 @@ class PieceTest {
         assert (king.validateMove("c4"));
         System.out.println("From d4 to c5");
         assert (king.validateMove("c5"));
-        System.out.println("All valid movement tests passed. Testing a few invalid moves now.\n");
+        System.out.println("All valid validation tests passed. Testing a few invalid validates now.\n");
 
         System.out.println("From d4 to d6");
         assertFalse(king.validateMove("d6"));
@@ -92,7 +92,7 @@ class PieceTest {
         assertFalse(king.validateMove("f6"));
         System.out.println("From d4 to d1");
         assertFalse(king.validateMove("d1"));
-        System.out.println("All passed. King moves properly.");
+        System.out.println("All passed. King validates properly.");
     }
 
     @Test
@@ -133,7 +133,7 @@ class PieceTest {
         assert (queen.validateMove("b4"));
         System.out.println("From d4 to b6");
         assert (queen.validateMove("b6"));
-        System.out.println("All valid movement tests passed. Testing a few invalid moves now.\n");
+        System.out.println("All valid validation tests passed. Testing a few invalid validates now.\n");
 
         System.out.println("From d4 to c6");
         assertFalse(queen.validateMove("c6"));
@@ -141,7 +141,7 @@ class PieceTest {
         assertFalse(queen.validateMove("e6"));
         System.out.println("From d4 to g8");
         assertFalse(queen.validateMove("g8"));
-        System.out.println("All passed. Queen moves properly.");
+        System.out.println("All passed. Queen validates properly.");
     }
 
     @Test
@@ -166,7 +166,7 @@ class PieceTest {
         assert (bishop.validateMove("b2"));
         System.out.println("From d4 to b6");
         assert (bishop.validateMove("b6"));
-        System.out.println("All valid movement tests passed. Testing a few invalid moves now.\n");
+        System.out.println("All valid validation tests passed. Testing a few invalid validates now.\n");
 
         System.out.println("From d4 to c6");
         assertFalse(bishop.validateMove("c6"));
@@ -178,7 +178,7 @@ class PieceTest {
         assertFalse(bishop.validateMove("d5"));
         System.out.println("From d4 to f4");
         assertFalse(bishop.validateMove("f4"));
-        System.out.println("All passed. Bishop moves properly.");
+        System.out.println("All passed. Bishop validates properly.");
     }
 
     @Test
@@ -198,7 +198,7 @@ class PieceTest {
         assert (rook.validateMove("d8"));
         System.out.println("From d4 to f4");
         assert (rook.validateMove("f4"));
-        System.out.println("All valid movement tests passed. Testing a few invalid moves now.\n");
+        System.out.println("All valid validation tests passed. Testing a few invalid validates now.\n");
 
         System.out.println("From d4 to e5");
         assertFalse(rook.validateMove("e5"));
@@ -208,7 +208,7 @@ class PieceTest {
         assertFalse(rook.validateMove("c3"));
         System.out.println("From d4 to c5");
         assertFalse(rook.validateMove("c5"));
-        System.out.println("All passed. Rook moves properly.");
+        System.out.println("All passed. Rook validates properly.");
     }
 
     @Test
@@ -232,7 +232,7 @@ class PieceTest {
         assert (knight.validateMove("c2"));
         System.out.println("From d4 to b3");
         assert (knight.validateMove("b3"));
-        System.out.println("All valid movement tests passed. Testing a few invalid moves now.\n");
+        System.out.println("All valid validation tests passed. Testing a few invalid validates now.\n");
 
         System.out.println("From d4 to e5");
         assertFalse(knight.validateMove("e5"));
@@ -248,7 +248,7 @@ class PieceTest {
         assertFalse(knight.validateMove("a8"));
         System.out.println("From d4 to a7");
         assertFalse(knight.validateMove("a7"));
-        System.out.println("All passed. Knight moves properly.");
+        System.out.println("All passed. Knight validates properly.");
     }
 
 }

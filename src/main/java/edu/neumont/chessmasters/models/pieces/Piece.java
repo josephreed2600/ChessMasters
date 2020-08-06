@@ -49,6 +49,7 @@ public abstract class Piece {
             return false;
 
         this.location = new Location(location);
+        numMoves++;
         return true;
     }
 
