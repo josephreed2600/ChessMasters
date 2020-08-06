@@ -1,5 +1,7 @@
 package edu.neumont.chessmasters.models.pieces;
 
+import edu.neumont.chessmasters.models.Location;
+
 public class Bishop extends Piece {
     public Bishop(PieceColor color) {
         super(color);
@@ -7,8 +9,8 @@ public class Bishop extends Piece {
 
     @Override
     public boolean validateMove(String move) {
-        int dx = Math.abs(getX() - getX(move));
-        int dy = Math.abs(getY() - Integer.valueOf(move.substring(1)));
+        int dx = Math.abs(getLocation().getX() - Location.getX(move));
+        int dy = Math.abs(getLocation().getY() - Location.getY(move));
         return dx == dy;
     }
 }
