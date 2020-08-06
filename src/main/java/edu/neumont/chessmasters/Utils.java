@@ -24,8 +24,18 @@ public class Utils {
 		}
 	}
 
-	public static class Colors {
+	public static class Styles {
+
 		public static final String reset         = USE_ANSI ? "\u001b[0m"   : "";
+		public static final String bold          = USE_ANSI ? "\u001b[1m"   : "";
+		public static final String normal        = USE_ANSI ? "\u001b[22m"  : ""; // unbold
+
+		public static final String lightSquare   = Background.darkgray;
+		public static final String darkSquare    = Background.black;
+		public static final String lightPiece    = bold + Foreground.white;
+		public static final String darkPiece     = bold + Foreground.lightgray;
+		public static final String afterPiece    = normal;
+
 		public static class Foreground {
 			public static final String black       = USE_ANSI ? "\u001b[30m"  : "";
 			public static final String red         = USE_ANSI ? "\u001b[31m"  : "";

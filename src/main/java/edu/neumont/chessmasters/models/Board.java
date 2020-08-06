@@ -86,18 +86,19 @@ public class Board {
 		boolean squareColor = true; // white, starting at a8
 
 		// Build each row
-		for (Piece[] rank : squares) {
+		for (int row = 7; row >= 0; row--) {
+			Piece[] rank = squares[row];
 			sb_out.append(prefix);
 
 			sb_out.append(' ').append(rankIndex--).append(' ');
 			for (Piece piece : rank) {
 				sb_out
 					.append(Utils.Drawing.Edges.vertical)
-					.append(squareColor ? Utils.Colors.Background.darkgray : Utils.Colors.Background.black)
+					.append(squareColor ? Utils.Styles.lightSquare : Utils.Styles.darkSquare)
 					.append(' ')
 					.append(piece == null ? '-' : piece)
 					.append(' ')
-					.append(Utils.Colors.reset)
+					.append(Utils.Styles.reset)
 					;
 				squareColor = !squareColor;
 			}
