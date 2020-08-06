@@ -1,50 +1,46 @@
 package edu.neumont.chessmasters.models;
 
 import edu.neumont.chessmasters.Utils;
+import edu.neumont.chessmasters.models.Location;
+import edu.neumont.chessmasters.models.pieces.*;
 
 public class Board {
-	private class Piece {}
-	// ok, a little weird, but a4 can be represented by File.A and Rank(4)
-	// jk let's not
-	//private static enum File { A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7 };
-	private static int File(String file) {
-		switch (file.toUpperCase()) {
-			case "A": return 0;
-			case "B": return 1;
-			case "C": return 2;
-			case "D": return 3;
-			case "E": return 4;
-			case "F": return 5;
-			case "G": return 6;
-			case "H": return 7;
-			default: throw new IllegalArgumentException("File must be between A and H, inclusive");
-		}
-	}
-	private static int File(Character file) {
-		return File(Character.toString(file));
-	}
-	private static int Rank(int rank) {
-		if (rank < 1 || rank > 8)
-			throw new IllegalArgumentException("Rank must be between 1 and 8, inclusive");
-		return rank - 1;
-	}
-	private static int Rank(String rank) {
-		return Rank(Integer.parseInt(rank));
-	}
-	private static int Rank(Character rank) {
-		return Rank(Character.toString(rank));
-	}
 
+	// y, x
 	private Piece[][] squares;
 	//public Piece[][] getSquares() { return squares; }
 	//public void setSquares(Piece[][] squares) { this.squares = squares; }
 
 	public Board() {
 		this.squares = new Piece[8][8];
+		for (int file = 0; file < 8; file++) {
+			placePiece(new Pawn(PieceColor.WHITE), new Location(file, 1));
+			placePiece(new Pawn(PieceColor.BLACK), new Location(file, 6));
+		}
+
+		placePiece(new   Rook(PieceColor.WHITE), new Location("a1"));
+		placePiece(new Knight(PieceColor.WHITE), new Location("b1"));
+		placePiece(new Bishop(PieceColor.WHITE), new Location("c1"));
+		placePiece(new  Queen(PieceColor.WHITE), new Location("d1"));
+		placePiece(new   King(PieceColor.WHITE), new Location("e1"));
+		placePiece(new Bishop(PieceColor.WHITE), new Location("f1"));
+		placePiece(new Knight(PieceColor.WHITE), new Location("g1"));
+		placePiece(new   Rook(PieceColor.WHITE), new Location("h1"));
+
+		placePiece(new   Rook(PieceColor.BLACK), new Location("a8"));
+		placePiece(new Knight(PieceColor.BLACK), new Location("b8"));
+		placePiece(new Bishop(PieceColor.BLACK), new Location("c8"));
+		placePiece(new  Queen(PieceColor.BLACK), new Location("d8"));
+		placePiece(new   King(PieceColor.BLACK), new Location("e8"));
+		placePiece(new Bishop(PieceColor.BLACK), new Location("f8"));
+		placePiece(new Knight(PieceColor.BLACK), new Location("g8"));
+		placePiece(new   Rook(PieceColor.BLACK), new Location("h8"));
 	}
 
-	public boolean placePiece(Piece p, int rank, int file) {
-		return false;
+	public boolean placePiece(Piece p, Location l) {
+		if (squares[l.getY()][l.getX()] != null) return false;
+		squares[l.getY()][l.getX()] = p;
+		return true;
 	}
 
 	@Override
