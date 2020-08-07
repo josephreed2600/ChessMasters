@@ -8,6 +8,11 @@ public class Pawn extends Piece {
         super(color, "p");
     }
 
+    public boolean shouldPromote() {
+        return (color == PieceColor.WHITE && getLocation().getY() == 7) ||
+                (color == PieceColor.BLACK && getLocation().getY() == 0);
+    }
+
     @Override
     public boolean validateMove(String move) {
         move = move.toLowerCase();

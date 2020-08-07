@@ -63,6 +63,34 @@ class PieceMovementTests {
     }
 
     @Test
+    void pawnPromotion() {
+        System.out.println("\nTesting pawn promotion");
+        Pawn wPawn = new Pawn(PieceColor.WHITE);
+        wPawn.setLocation("A8");
+        assert(wPawn.shouldPromote());
+        System.out.println("White pawn at A8 should be promoted.");
+        wPawn.setLocation("A7");
+        assertFalse(wPawn.shouldPromote());
+        System.out.println("White pawn at A7 should correctly not be promoted.");
+        wPawn.setLocation("A1");
+        assertFalse(wPawn.shouldPromote());
+        System.out.println("White pawn at A7 should correctly not be promoted.");
+
+        Pawn bPawn = new Pawn(PieceColor.BLACK);
+        bPawn.setLocation("A1");
+        assert(bPawn.shouldPromote());
+        System.out.println("Black pawn at A1 should be promoted.");
+        bPawn.setLocation("A2");
+        assertFalse(bPawn.shouldPromote());
+        System.out.println("Black pawn at A2 should correctly not be promoted.");
+        bPawn.setLocation("A8");
+        assertFalse(bPawn.shouldPromote());
+        System.out.println("Black pawn at A8 should correctly not be promoted.");
+
+        System.out.println("TEST PASSED!");
+    }
+
+    @Test
     void kingTest() {
         King king = new King(PieceColor.WHITE);
         System.out.println("\nTesting that king can move in each of the 8 directions.");
