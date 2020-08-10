@@ -1,5 +1,4 @@
-package Controllers;
-
+package edu.neumont.chessmasters.controllers;
 
 import me.travja.utils.utils.IOUtils;
 

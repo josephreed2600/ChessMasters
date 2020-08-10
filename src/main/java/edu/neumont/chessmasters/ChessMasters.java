@@ -1,12 +1,11 @@
 package edu.neumont.chessmasters;
 
-
-import Controllers.PlayerMove;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
+import edu.neumont.chessmasters.models.*;
+import edu.neumont.chessmasters.controllers.PlayerMove;
 
 public class ChessMasters {
 
