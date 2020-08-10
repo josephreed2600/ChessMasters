@@ -87,24 +87,15 @@ public class Board {
 		if (p instanceof Pawn) {
 			// in a valid move, either we're capturing or we're going straight forward
 			return (victim != null) ^ (p.getLocation().getX() == dest.getX());
-		}
-		if (p instanceof Rook) {
+		} else if (p instanceof Rook
+				|| p instanceof Knight
+		 		|| p instanceof Bishop
+				|| p instanceof Queen
+				|| p instanceof King) {
 			return true;
+		} else {
+			throw new UnsupportedOperationException("I don't know how to validate this move for this piece");
 		}
-		if (p instanceof Knight) {
-			return true;
-		}
-		if (p instanceof Bishop) {
-			return true;
-		}
-		if (p instanceof Queen) {
-			return true;
-		}
-		if (p instanceof King) {
-			return true;
-		}
-
-		throw new UnsupportedOperationException("I don't know how to validate this move for this piece");
 	}
 
 	public boolean movePiece(String from, String to) {

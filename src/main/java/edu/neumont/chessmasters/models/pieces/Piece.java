@@ -6,7 +6,7 @@ import edu.neumont.chessmasters.models.Location;
 public abstract class Piece {
 
     protected final PieceColor color;
-		protected final String notation;
+    protected final String notation;
 
     protected int numMoves = 0;
     protected Location location;
@@ -36,7 +36,7 @@ public abstract class Piece {
         return location;
     }
 
-		public void setLocation(Location location) {
+    public void setLocation(Location location) {
 			this.location = location;
 		}
 
@@ -64,9 +64,9 @@ public abstract class Piece {
         return true;
     }
 
-		public boolean move(Location location) {
-			return move(location.toString());
-		}
+    public boolean move(Location location) {
+        return move(location.toString());
+    }
 
     public abstract boolean validateMove(String move);
 
