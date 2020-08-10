@@ -46,6 +46,10 @@ public class Board {
 		placePiece(new   Rook(PieceColor.BLACK), new Location("h8"));
 	}
 
+	public void clearBoard() {
+		this.squares = new Piece[8][8];
+	}
+
 	public boolean placePiece(Piece p, Location l) {
 		if (getSquare(l) != null) return false;
 		setSquare(l, p);
