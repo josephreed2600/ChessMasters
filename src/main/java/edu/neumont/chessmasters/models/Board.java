@@ -66,7 +66,7 @@ public class Board {
 	public boolean validateMove(Piece p, Location dest) {
 		// TODO implement checks for:
 		//  - moving through pieces
-		
+
 		// check whether we're capturing
 		Piece victim = getSquare(dest);
 		if (victim != null) {
@@ -118,6 +118,11 @@ public class Board {
 		if (!p.move(to)) return false;
 		setSquare(to, p);
 		setSquare(from, null);
+
+		if (p instanceof Pawn && ((Pawn) p).shouldPromote()) { //Promote pawn to queen.
+			setSquare(to, new Queen(p.getColor()));
+		}
+
 		return true;
 	}
 
