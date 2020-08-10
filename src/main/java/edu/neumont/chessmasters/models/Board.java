@@ -8,6 +8,15 @@ public class Board {
 
 	// y, x
 	private Piece[][] squares;
+	private Piece getSquare(String s) {
+		return getSquare(new Location(s));
+	}
+	private Piece getSquare(Location l) {
+		return squares[l.getY()][l.getX()];
+	}
+	private void setSquare(Location l, Piece p) {
+		squares[l.getY()][l.getX()] = p;
+	}
 	//public Piece[][] getSquares() { return squares; }
 	//public void setSquares(Piece[][] squares) { this.squares = squares; }
 
@@ -38,8 +47,77 @@ public class Board {
 	}
 
 	public boolean placePiece(Piece p, Location l) {
-		if (squares[l.getY()][l.getX()] != null) return false;
-		squares[l.getY()][l.getX()] = p;
+		if (getSquare(l) != null) return false;
+		setSquare(l, p);
+		p.setLocation(l);
+		return true;
+	}
+
+	// Checks whether the exclusive range of squares is empty
+	// (all squares between a and b, not including a and b)
+	public boolean pathIsEmpty(Location a, Location b) {
+		Location[] path = Location.getExclusiveRange(a, b);
+		for (Location l : path)
+			if (getSquare(l) != null)
+				return false;
+		return true;
+	}
+
+	public boolean validateMove(Piece p, Location dest) {
+		// TODO implement checks for:
+		//  - moving through pieces
+		
+		// check whether we're capturing
+		Piece victim = getSquare(dest);
+		if (victim != null) {
+			// if we are, ensure that we're capturing an opponent
+			if (victim.getColor() == p.getColor())
+				return false;
+			// if we're trying to capture a king, something has gone horribly wrong---we
+			// shouldn't have been able to reach this configuration in the first place
+			if (victim instanceof King)
+				throw new UnsupportedOperationException
+					("An attempt was made to capture a king, indicating that the game was in an illegal state");
+		}
+
+		// check whether we're moving through a piece
+		if (!pathIsEmpty(p.getLocation(), dest))
+			return false;
+
+		if (p instanceof Pawn) {
+			// in a valid move, either we're capturing or we're going straight forward
+			return (victim != null) ^ (p.getLocation().getX() == dest.getX());
+		}
+		if (p instanceof Rook) {
+			return true;
+		}
+		if (p instanceof Knight) {
+			return true;
+		}
+		if (p instanceof Bishop) {
+			return true;
+		}
+		if (p instanceof Queen) {
+			return true;
+		}
+		if (p instanceof King) {
+			return true;
+		}
+
+		throw new UnsupportedOperationException("I don't know how to validate this move for this piece");
+	}
+
+	public boolean movePiece(String from, String to) {
+		return movePiece(new Location(from), new Location(to));
+	}
+
+	public boolean movePiece(Location from, Location to) {
+		Piece p = getSquare(from);
+		if (p == null) return false;
+		if (!validateMove(p, to)) return false;
+		if (!p.move(to)) return false;
+		setSquare(to, p);
+		setSquare(from, null);
 		return true;
 	}
 

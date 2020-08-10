@@ -46,4 +46,42 @@ public class Location {
         return Integer.valueOf(c) - Integer.valueOf('a');
     }
 
+		public static Location[] getExclusiveRange(Location a, Location b) {
+			int ax = a.getX(), ay = a.getY(),
+					bx = b.getX(), by = b.getY(),
+					Dx = bx - ax , Dy = by - ay ;
+			// if locations are adjacent or overlap
+			if (-1 <= Dx && Dx <= 1 && -1 <= Dy && Dy <= 1)
+				return new Location[0];
+			// if we're not moving along a rank or a file, and we're not moving along a diagonal,
+			// then we're doing something weird like a knight. return an empty set
+			if (!(Dx == 0 ^ Dy == 0) && Math.abs(Dx) != Math.abs(Dy))
+				return new Location[0];
+
+			// vector components for iterating along the line
+			int dx = (Dx == 0 ? 0 : Dx / Math.abs(Dx))
+				, dy = (Dy == 0 ? 0 : Dy / Math.abs(Dy));
+
+			Location[] out = new Location[Math.max(Math.abs(Dx), Math.abs(Dy)) - 1];
+
+			int index = 0;
+			while (ax+dx != bx || ay+dy != by) {
+				ax += dx;
+				ay += dy;
+				out[index++] = new Location(ax, ay);
+			}
+			return out;
+		}
+
+		@Override
+		public String toString() {
+			int rank = 1 + getY();
+			char file = (char)('a' + getX());
+			return Character.toString(file) + Integer.toString(rank);
+		}
+
+		public boolean equals(Location other) {
+			return this.getX() == other.getX() && this.getY() == other.getY();
+		}
+
 }

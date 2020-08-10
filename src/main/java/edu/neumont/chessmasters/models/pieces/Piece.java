@@ -36,6 +36,9 @@ public abstract class Piece {
         return location;
     }
 
+		public void setLocation(Location location) {
+			this.location = location;
+		}
 
     public void setLocation(String location) {
         this.location = new Location(location);
@@ -60,6 +63,10 @@ public abstract class Piece {
         numMoves++;
         return true;
     }
+
+		public boolean move(Location location) {
+			return move(location.toString());
+		}
 
     public abstract boolean validateMove(String move);
 
