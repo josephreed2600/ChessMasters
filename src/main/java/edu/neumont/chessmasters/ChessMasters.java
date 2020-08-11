@@ -27,6 +27,7 @@ public class ChessMasters {
         //This just allows the jar to be double-clicked in windows.
         if (!System.getProperty("os.name").toLowerCase().contains("windows") || (args.length >= 1 && (arrayContains(args, "-start") || arrayContains(args, "-debug")))) {
             debug = arrayContains(args, "-debug");
+            registerEvents();
             PlayerMove.PromptChoice();
 //        System.out.println("You input '" + input + "'");
 //        String input = IOUtils.promptForString("Enter a string: ");
