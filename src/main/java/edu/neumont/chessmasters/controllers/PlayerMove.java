@@ -2,7 +2,7 @@ package edu.neumont.chessmasters.controllers;
 
 import me.travja.utils.utils.IOUtils;
 
-import java.util.regex.*;
+import java.util.regex.Pattern;
 
 public class PlayerMove {
 
@@ -30,13 +30,9 @@ public class PlayerMove {
         boolean checkerTwo = Pattern.matches("[A-Ha-h][1-8]", po2);
 
 
-        if (checkerOne == true) {
-            //System.out.println("You are correct");
-
-            if (checkerTwo == true) {
-                System.out.println("both of your inputs are valid");
-                //Sends both moves to next method to move piece
-            }
+        if (checkerOne == true && checkerTwo == true) {
+            System.out.println("both of your inputs are valid");
+            //Sends both moves to next method to move piece
         } else {
             System.out.println("one of your inputs was invalid \n TRY AGAIN");
             PromptChoice();
