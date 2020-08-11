@@ -78,7 +78,7 @@
         <dependency>
             <groupId>com.github.Travja</groupId>
             <artifactId>TravjaUtils</artifactId>
-            <version>v1.0.03</version>
+            <version>v1.0.05</version>
         </dependency>
 
         <dependency>
