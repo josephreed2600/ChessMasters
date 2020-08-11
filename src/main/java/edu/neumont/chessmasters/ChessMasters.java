@@ -1,11 +1,13 @@
 package edu.neumont.chessmasters;
 
+import edu.neumont.chessmasters.controllers.PlayerMove;
+import edu.neumont.chessmasters.events.EventListener;
+import edu.neumont.chessmasters.events.EventRegistry;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
-import edu.neumont.chessmasters.models.*;
-import edu.neumont.chessmasters.controllers.PlayerMove;
 
 public class ChessMasters {
 
@@ -40,5 +42,7 @@ public class ChessMasters {
         }
     }
 
-
+    private static void registerEvents() {
+        EventRegistry.registerEvents(new EventListener());
+    }
 }
