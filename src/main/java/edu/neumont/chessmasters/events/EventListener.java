@@ -9,4 +9,9 @@ public class EventListener {
         System.out.println("Caught event! This is just a sample event.");
     }
 
+    @EventHandler
+    public void capture(PieceCaptureEvent event) {
+        System.out.println("Piece is about to be captured!");
+    }
+
 }

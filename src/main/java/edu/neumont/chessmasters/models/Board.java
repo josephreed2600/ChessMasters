@@ -1,6 +1,8 @@
 package edu.neumont.chessmasters.models;
 
 import edu.neumont.chessmasters.Utils;
+import edu.neumont.chessmasters.events.EventRegistry;
+import edu.neumont.chessmasters.events.PieceCaptureEvent;
 import edu.neumont.chessmasters.models.Location;
 import edu.neumont.chessmasters.models.pieces.*;
 
@@ -87,6 +89,13 @@ public class Board {
 		// check whether we're moving through a piece
 		if (!pathIsEmpty(p.getLocation(), dest))
 			return false;
+
+		if (victim != null &&
+				( (p instanceof Pawn && p.getLocation().getX() != dest.getX())
+						|| !(p instanceof Pawn) ) ) {
+			PieceCaptureEvent event = new PieceCaptureEvent(p, victim); //Fire our capture event when a piece is captured.
+			EventRegistry.callEvents(event);
+		}
 
 		if (p instanceof Pawn) {
 			// in a valid move, either we're capturing or we're going straight forward
