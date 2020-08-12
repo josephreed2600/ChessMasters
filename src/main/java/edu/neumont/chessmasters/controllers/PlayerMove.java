@@ -79,7 +79,7 @@ public class PlayerMove {
     private static void helpMenu() {
         StringBuilder helper = new StringBuilder("Helper commands");
 
-        helper.append("\nWhen inputting a position only give two characters:\n Ex) A2").append("To quit/ forfeit the game simply type quit whenever");
+        helper.append("\nWhen inputting a position only give two characters:\n Ex) A2").append("\nTo quit/forfeit the game simply type quit whenever\n");
         System.out.println(helper);
 
         MenuPrompt();
