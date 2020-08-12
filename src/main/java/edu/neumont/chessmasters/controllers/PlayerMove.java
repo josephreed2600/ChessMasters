@@ -1,7 +1,7 @@
 package edu.neumont.chessmasters.controllers;
 
 import me.travja.utils.utils.IOUtils;
-import org.apache.commons.lang3.ClassUtils;
+
 
 import java.util.regex.Pattern;
 
@@ -12,6 +12,7 @@ public class PlayerMove {
 
         StringBuilder sb = new StringBuilder("Welcome to Chess Masters");
         sb.append("\n\n").append("1)Make move \n").append("2)help").append("3)quit");
+        System.out.println(sb);
         String input = IOUtils.promptForString("Enter a choice");
 
 
@@ -56,7 +57,7 @@ public class PlayerMove {
         boolean checkerTwo = Pattern.matches("[A-Ha-h][1-8]", po2);
 
 
-        if (checkerOne == true && checkerTwo == true) {
+        if (checkerOne  && checkerTwo ) {
             System.out.println("both of your inputs are valid");
             //Sends both moves to next method to move piece
         } else {
@@ -79,6 +80,9 @@ public class PlayerMove {
         StringBuilder helper = new StringBuilder("Helper commands");
 
         helper.append("\nWhen inputting a position only give two characters:\n Ex) A2").append("To quit/ forfeit the game simply type quit whenever");
+        System.out.println(helper);
+
+        MenuPrompt();
     }
 
 
