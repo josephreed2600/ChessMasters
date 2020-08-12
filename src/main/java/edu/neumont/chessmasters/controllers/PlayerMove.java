@@ -10,8 +10,9 @@ public class PlayerMove {
     private        Board      board;
     private static PlayerMove inst;
 
-    public PlayerMove() {
+    public PlayerMove(Board board) {
         inst = this;
+        this.board = board;
     }
 
     public static PlayerMove inst() {
@@ -22,8 +23,7 @@ public class PlayerMove {
         return board;
     }
 
-    public void run(Board board) {
-        this.board = board;
+    public void run() {
         MenuPrompt();
     }
 
