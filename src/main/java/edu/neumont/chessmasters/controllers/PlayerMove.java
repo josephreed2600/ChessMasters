@@ -1,12 +1,20 @@
 package edu.neumont.chessmasters.controllers;
 
+import edu.neumont.chessmasters.models.Board;
 import me.travja.utils.utils.IOUtils;
 
 import java.util.regex.Pattern;
 
 public class PlayerMove {
 
-    public static void PromptChoice() {
+    private static Board board;
+
+    public static Board getBoard() {
+        return board;
+    }
+
+    public static void run(Board board) {
+        PlayerMove.board = board;
 
         //Prompts user for first location
         System.out.println("Which piece do you want to move based on location {Ex: A1}");
@@ -35,7 +43,7 @@ public class PlayerMove {
             //Sends both moves to next method to move piece
         } else {
             System.out.println("one of your inputs was invalid \n TRY AGAIN");
-            PromptChoice();
+            run(board);
         }
 
     }

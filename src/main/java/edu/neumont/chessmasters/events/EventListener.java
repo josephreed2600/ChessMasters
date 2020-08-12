@@ -5,7 +5,7 @@ import edu.neumont.chessmasters.annotations.EventHandler;
 public class EventListener {
 
     @EventHandler
-    public void move(PieceMoveEvent event) {
+    public void move(PrePieceMoveEvent event) {
         System.out.println("Caught event! This is just a sample event.");
     }
 
