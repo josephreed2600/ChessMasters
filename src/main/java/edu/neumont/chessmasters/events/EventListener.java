@@ -15,6 +15,9 @@ public class EventListener {
         King king = tempBoard.getKing(event.getPiece().getColor());
         if (tempBoard.isInCheck(king)) {
 
+            if(king.getLocation().equals(event.getPiece().getLocation())) {
+                king.setLocation(event.getPassedLocation());
+            }
             tempBoard.setSquare(event.getFrom(), null);
             tempBoard.setSquare(event.getPassedLocation(), event.getPiece());
             if (tempBoard.isInCheck(king)) {

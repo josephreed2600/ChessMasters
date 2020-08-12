@@ -17,9 +17,7 @@ public class EventRegistry {
             if (handler == null)
                 continue;
 
-            System.out.println("Found EventHandler " + method.getName());
             Class<? extends Event> eventType = (Class<? extends Event>) method.getParameterTypes()[0];
-            System.out.println("Event type: " + eventType.getSimpleName());
             if (eventType.equals(event.getClass()))
                 ret.add(method);
         }
@@ -47,7 +45,6 @@ public class EventRegistry {
         for (Object obj : registeredClasses) {
             for (Method method : getMethods(obj, event)) {
                 try {
-                    System.out.println("Calling event");
                     method.invoke(obj, event);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     System.out.println("Could not call event '" + event.getName() + "'. Please see the following error:");
