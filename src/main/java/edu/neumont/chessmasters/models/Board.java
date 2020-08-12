@@ -55,11 +55,11 @@ public class Board {
 		}
 		return pieces;
 	}
-	//public Piece[][] getSquares() { return squares; }
-	//public void setSquares(Piece[][] squares) { this.squares = squares; }
 
-	public Board() {
+	public Board(boolean withPawns) {
 		this.squares = new Piece[8][8];
+
+		if (withPawns)
 		for (int file = 0; file < 8; file++) {
 			placePiece(new Pawn(PieceColor.WHITE), new Location(file, 1));
 			placePiece(new Pawn(PieceColor.BLACK), new Location(file, 6));
@@ -84,6 +84,25 @@ public class Board {
 		placePiece(new   Rook(PieceColor.BLACK), new Location("h8"));
 	}
 
+	// copy ctor
+	public Board(Board original) {
+		this.squares = new Piece[8][8];
+
+		// copy pieces over
+		for (int rank = 0; rank < 8; rank++) {
+			for (int file = 0; file < 8; file++) {
+				Location l = new Location(file, rank);
+				Piece p = original.getSquare(l);
+				this.setSquare(l, p);
+			}
+		}
+	}
+
+	// create board with pawns
+	public Board() {
+		this(true);
+	}
+
 	public void clearBoard() {
 		this.squares = new Piece[8][8];
 	}
@@ -106,9 +125,6 @@ public class Board {
 	}
 
 	public boolean validateMove(Piece p, Location dest) {
-		// TODO implement checks for:
-		//  - moving through pieces
-
 		// check whether we're moving through a piece
 		if (!pathIsEmpty(p.getLocation(), dest))
 			return false;
