@@ -55,7 +55,7 @@ public class Location {
             return new Location[0];
         // if we're not moving along a rank or a file, and we're not moving along a diagonal,
         // then we're doing something weird like a knight. return an empty set
-        if (!(Dx == 0 ^ Dy == 0) && Math.abs(Dx) != Math.abs(Dy))
+        if ((Dx == 0) == (Dy == 0) && Math.abs(Dx) != Math.abs(Dy))
             return new Location[0];
 
         // vector components for iterating along the line
@@ -76,7 +76,7 @@ public class Location {
     public String toString() {
         int rank = 1 + getY();
         char file = (char) ('a' + getX());
-        return Character.toString(file) + Integer.toString(rank);
+        return Character.toString(file) + rank;
     }
 
     public boolean equals(Location other) {

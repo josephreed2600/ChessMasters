@@ -3,13 +3,14 @@ package edu.neumont.chessmasters.events;
 import edu.neumont.chessmasters.models.Location;
 import edu.neumont.chessmasters.models.pieces.Piece;
 
-public class PieceMoveEvent extends Event {
+public class PrePieceMoveEvent extends Event {
 
     private final Piece    piece;
     private final Location passedLocation;
     private       Location location;
+    private       boolean  cancelled = false;
 
-    public PieceMoveEvent(Piece piece, Location location) {
+    public PrePieceMoveEvent(Piece piece, Location location) {
         this.piece = piece;
         this.location = location;
         this.passedLocation = location;
@@ -33,6 +34,21 @@ public class PieceMoveEvent extends Event {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    /**
+     * You can cancel the event and it won't go through.
+     */
+    public void cancel() {
+        cancelled = true;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
     }
 
 }
