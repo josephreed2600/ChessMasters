@@ -185,6 +185,34 @@ public class Board {
 		return true;
 	}
 
+	public boolean isInCheck(King king) {
+		for (Piece piece : getAllPieces(king.getColor().getOpposite())) {
+			if (pieceCreatesCheck(piece, king)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public boolean pieceCreatesCheck(Piece piece) {
+		King king = getKing(piece.getColor().getOpposite());
+		return pieceCreatesCheck(piece, king);
+	}
+
+	public boolean pieceCreatesCheck(Piece piece, King king) {
+		if (!piece.validateMove(king.getLocation()))
+			return false;
+		try {
+			validateMove(piece, king.getLocation());
+		} catch (UnsupportedOperationException e) {
+			return true;
+		}
+
+		return false;
+	}
+
+
 	@Override
 	public String toString() {
 

@@ -47,7 +47,7 @@ public class ChessMasters {
         do {
             //Run setup here.
             Board board = new Board();
-            PlayerMove.run(board);
+            new PlayerMove().run(board);
             playAgain = IOUtils.promptForBoolean("Play again? (y/n)", "y", "n");
         } while (playAgain);
         System.out.println("Goodbye");
