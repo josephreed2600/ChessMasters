@@ -1,11 +1,13 @@
 package edu.neumont.chessmasters;
 
+import edu.neumont.chessmasters.controllers.PlayerMove;
+import edu.neumont.chessmasters.events.EventListener;
+import edu.neumont.chessmasters.events.EventRegistry;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
-import edu.neumont.chessmasters.models.*;
-import edu.neumont.chessmasters.controllers.PlayerMove;
 
 public class ChessMasters {
 
@@ -25,6 +27,7 @@ public class ChessMasters {
         //This just allows the jar to be double-clicked in windows.
         if (!System.getProperty("os.name").toLowerCase().contains("windows") || (args.length >= 1 && (arrayContains(args, "-start") || arrayContains(args, "-debug")))) {
             debug = arrayContains(args, "-debug");
+            registerEvents();
             PlayerMove.PromptChoice();
 //        System.out.println("You input '" + input + "'");
 //        String input = IOUtils.promptForString("Enter a string: ");
@@ -40,5 +43,7 @@ public class ChessMasters {
         }
     }
 
-
+    private static void registerEvents() {
+        EventRegistry.registerEvents(new EventListener());
+    }
 }
