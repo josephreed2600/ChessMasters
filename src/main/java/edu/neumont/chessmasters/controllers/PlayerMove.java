@@ -1,14 +1,17 @@
 package edu.neumont.chessmasters.controllers;
 
 import edu.neumont.chessmasters.models.Board;
+import edu.neumont.chessmasters.models.pieces.Piece;
+import edu.neumont.chessmasters.models.pieces.PieceColor;
 import me.travja.utils.utils.IOUtils;
 
 import java.util.regex.Pattern;
 
 public class PlayerMove {
 
-    private        Board      board;
+    private Board board;
     private static PlayerMove inst;
+    public int counter = 0;
 
     public PlayerMove(Board board) {
         inst = this;
@@ -24,11 +27,17 @@ public class PlayerMove {
     }
 
     public void run() {
-        MenuPrompt();
+        do{
+            MenuPrompt();
+        }while (true);
+
+
+
+
     }
 
     public void MenuPrompt() {
-
+        System.out.println(board);
         StringBuilder sb = new StringBuilder("Welcome to Chess Masters");
         sb.append("\n\n").append("1)Make move \n").append("2)help").append("\n3)quit");
         System.out.println(sb);
@@ -40,7 +49,11 @@ public class PlayerMove {
         do {
             switch (Integer.parseInt(input)) {
                 case 1:
-                    PromptMove();
+                    while (!PromptMove()){
+                        System.out.println("Invalid move try again");
+                    }
+                    counter ++;
+                    System.out.println(board);
                     break;
                 case 2:
                     helpMenu();
@@ -52,36 +65,88 @@ public class PlayerMove {
 
     }
 
-    public void PromptMove() {
-        //Prompts user for first location
-        System.out.println("\nWhich piece do you want to move based on location {Ex: A1}");
-        String positionOne = IOUtils.promptForString("Enter a string: ");
+    public boolean PromptMove() {
 
-        QuitGame(positionOne);
+        //Prompts user for first location
+        boolean checkPiece = true;
+        boolean checkSecond = true;
+        System.out.println("\nWhich piece do you want to move based on location {Ex: A1}");
+        String positionOne = null;
+        String positionTwo = null;
+
+
+        do {
+            positionOne = IOUtils.promptForString("Enter a string: ");
+            QuitGame(positionOne);
+
+            checkPiece = CheckMove(positionOne);
+
+
+            //checks if position is true (valid location)
+            if (checkPiece) {
+                Piece p = board.getSquare(positionOne);
+
+
+                if (p == null) {
+                    checkPiece = false;
+                    System.out.println("no piece here");
+                } else {
+                    PieceColor colorPiece = p.getColor();
+
+                    if (counter % 2 == 0) {
+                        //Checking white piece
+                        if (colorPiece != PieceColor.WHITE) {
+                            checkPiece = false;
+                            System.out.println("wrong piece color");
+                        }
+
+                    } else {
+                        //Checking black turn {Piece}
+                        if (colorPiece != PieceColor.BLACK) {
+                            checkPiece = false;
+                            System.out.println("wrong piece color");
+                        }
+
+                    }
+                }
+
+
+            }
+
+        } while (!checkPiece);
+
+
+
+        do{
+            System.out.println("Position You want to move piece Ex: A2");
+            positionTwo = IOUtils.promptForString("Enter a string  ");
+            QuitGame(positionTwo);
+
+            checkSecond = CheckMove(positionTwo);
+            if(!checkSecond){
+                System.out.println("You have chosen an incorrect location ");
+            }
+        }while (!checkSecond);
+
 
         //System.out.println(positionOne);
 
-        System.out.println("Position You want to move piece Ex: A2");
-        String positionTwo = IOUtils.promptForString("Enter a string  ");
 
-        QuitGame(positionTwo);
+
+
 
         //Checks users input is a valid position.
-        CheckMove(positionOne, positionTwo);
+        boolean c = board.movePiece(positionOne, positionTwo);
+
+        return c;
+
+
     }
 
-    private void CheckMove(String po1, String po2) {
+    private boolean CheckMove(String po1) {
         boolean checkerOne = Pattern.matches("[A-Ha-h][1-8]", po1);
-        boolean checkerTwo = Pattern.matches("[A-Ha-h][1-8]", po2);
+        return checkerOne;
 
-
-        if (checkerOne && checkerTwo) {
-            System.out.println("both of your inputs are valid");
-            //Sends both moves to next method to move piece
-        } else {
-            System.out.println("one of your inputs was invalid \n TRY AGAIN");
-            PromptMove();
-        }
 
     }
 

@@ -13,7 +13,7 @@ public class Board {
 	// y, x
 	private Piece[][] squares;
 
-	private Piece getSquare(String s) {
+	public Piece getSquare(String s) {
 		return getSquare(new Location(s));
 	}
 
