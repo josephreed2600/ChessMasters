@@ -1,9 +1,8 @@
 package edu.neumont.chessmasters.models.pieces;
 
-import edu.neumont.chessmasters.ChessMasters;
 import edu.neumont.chessmasters.Utils;
 import edu.neumont.chessmasters.events.EventRegistry;
-import edu.neumont.chessmasters.events.PieceMoveEvent;
+import edu.neumont.chessmasters.events.PrePieceMoveEvent;
 import edu.neumont.chessmasters.models.Location;
 
 public abstract class Piece {
@@ -21,6 +20,10 @@ public abstract class Piece {
 
     public Piece(PieceColor color) {
         this(color, "?");
+    }
+
+    public String getName() {
+        return this.getClass().getSimpleName();
     }
 
     public PieceColor getColor() {
@@ -61,8 +64,11 @@ public abstract class Piece {
         location = location.toLowerCase();
 
         //We have to make sure to CALL our events
-        PieceMoveEvent event = new PieceMoveEvent(this, new Location(location));
+        PrePieceMoveEvent event = new PrePieceMoveEvent(this, new Location(location));
         EventRegistry.callEvents(event);
+
+        if(event.isCancelled())
+            return false;
 
         location = event.getLocation().toString();
 
@@ -76,6 +82,10 @@ public abstract class Piece {
 
     public boolean move(Location location) {
         return move(location.toString());
+    }
+
+    public boolean validateMove(Location location) {
+        return validateMove(location.toString());
     }
 
     public abstract boolean validateMove(String move);

@@ -1,14 +1,33 @@
 package edu.neumont.chessmasters.controllers;
 
+import edu.neumont.chessmasters.models.Board;
 import me.travja.utils.utils.IOUtils;
-
 
 import java.util.regex.Pattern;
 
 public class PlayerMove {
 
+    private        Board      board;
+    private static PlayerMove inst;
 
-    public static void MenuPrompt() {
+    public PlayerMove(Board board) {
+        inst = this;
+        this.board = board;
+    }
+
+    public static PlayerMove inst() {
+        return inst;
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public void run() {
+        MenuPrompt();
+    }
+
+    public void MenuPrompt() {
 
         StringBuilder sb = new StringBuilder("Welcome to Chess Masters");
         sb.append("\n\n").append("1)Make move \n").append("2)help").append("\n3)quit");
@@ -33,8 +52,7 @@ public class PlayerMove {
 
     }
 
-    public static void PromptMove() {
-
+    public void PromptMove() {
         //Prompts user for first location
         System.out.println("\nWhich piece do you want to move based on location {Ex: A1}");
         String positionOne = IOUtils.promptForString("Enter a string: ");
@@ -52,7 +70,7 @@ public class PlayerMove {
         CheckMove(positionOne, positionTwo);
     }
 
-    private static void CheckMove(String po1, String po2) {
+    private void CheckMove(String po1, String po2) {
         boolean checkerOne = Pattern.matches("[A-Ha-h][1-8]", po1);
         boolean checkerTwo = Pattern.matches("[A-Ha-h][1-8]", po2);
 
@@ -67,7 +85,7 @@ public class PlayerMove {
 
     }
 
-    private static void QuitGame(String s) {
+    private void QuitGame(String s) {
         String quit = "quit";
 
         if (s.equals(quit)) {
@@ -76,7 +94,7 @@ public class PlayerMove {
         }
     }
 
-    private static void helpMenu() {
+    private void helpMenu() {
         StringBuilder helper = new StringBuilder("Helper commands");
 
         helper.append("\n\nWhen inputting a position only give two characters:\n Ex) A2").append("\nTo quit/forfeit the game simply type quit whenever\n");

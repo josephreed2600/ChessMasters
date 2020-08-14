@@ -3,27 +3,63 @@ package edu.neumont.chessmasters.models;
 import edu.neumont.chessmasters.Utils;
 import edu.neumont.chessmasters.events.EventRegistry;
 import edu.neumont.chessmasters.events.PieceCaptureEvent;
-import edu.neumont.chessmasters.models.Location;
+import edu.neumont.chessmasters.events.PostPieceMoveEvent;
 import edu.neumont.chessmasters.models.pieces.*;
+
+import java.util.ArrayList;
 
 public class Board {
 
 	// y, x
 	private Piece[][] squares;
+
 	private Piece getSquare(String s) {
 		return getSquare(new Location(s));
 	}
-	private Piece getSquare(Location l) {
+
+	public Piece getSquare(Location l) {
 		return squares[l.getY()][l.getX()];
 	}
-	private void setSquare(Location l, Piece p) {
+
+	public void setSquare(Location l, Piece p) {
 		squares[l.getY()][l.getX()] = p;
 	}
-	//public Piece[][] getSquares() { return squares; }
-	//public void setSquares(Piece[][] squares) { this.squares = squares; }
 
-	public Board() {
+	public King getKing(PieceColor color) {
+		for (int y = 0; y < 8; y++) {
+			for (int x = 0; x < 8; x++) {
+				Piece piece = getSquare(new Location(x, y));
+				if (piece != null && piece instanceof King && piece.getColor() == color)
+					return (King) piece;
+			}
+		}
+
+		return null;
+	}
+
+	public ArrayList<Piece> getAllPieces() {
+		ArrayList<Piece> pieces = new ArrayList<>();
+		pieces.addAll(getAllPieces(PieceColor.BLACK));
+		pieces.addAll(getAllPieces(PieceColor.WHITE));
+		return pieces;
+	}
+
+	public ArrayList<Piece> getAllPieces(PieceColor color) {
+		ArrayList<Piece> pieces = new ArrayList<>();
+		for (int y = 0; y < 8; y++) {
+			for (int x = 0; x < 8; x++) {
+				Piece piece = getSquare(new Location(x, y));
+				if (piece != null && piece.getColor() == color)
+					pieces.add(piece);
+			}
+		}
+		return pieces;
+	}
+
+	public Board(boolean withPawns) {
 		this.squares = new Piece[8][8];
+
+		if (withPawns)
 		for (int file = 0; file < 8; file++) {
 			placePiece(new Pawn(PieceColor.WHITE), new Location(file, 1));
 			placePiece(new Pawn(PieceColor.BLACK), new Location(file, 6));
@@ -48,6 +84,25 @@ public class Board {
 		placePiece(new   Rook(PieceColor.BLACK), new Location("h8"));
 	}
 
+	// copy ctor
+	public Board(Board original) {
+		this.squares = new Piece[8][8];
+
+		// copy pieces over
+		for (int rank = 0; rank < 8; rank++) {
+			for (int file = 0; file < 8; file++) {
+				Location l = new Location(file, rank);
+				Piece p = original.getSquare(l);
+				this.setSquare(l, p);
+			}
+		}
+	}
+
+	// create board with pawns
+	public Board() {
+		this(true);
+	}
+
 	public void clearBoard() {
 		this.squares = new Piece[8][8];
 	}
@@ -70,8 +125,9 @@ public class Board {
 	}
 
 	public boolean validateMove(Piece p, Location dest) {
-		// TODO implement checks for:
-		//  - moving through pieces
+		// check whether we're moving through a piece
+		if (!pathIsEmpty(p.getLocation(), dest))
+			return false;
 
 		// check whether we're capturing
 		Piece victim = getSquare(dest);
@@ -86,10 +142,6 @@ public class Board {
 					("An attempt was made to capture a king, indicating that the game was in an illegal state");
 		}
 
-		// check whether we're moving through a piece
-		if (!pathIsEmpty(p.getLocation(), dest))
-			return false;
-
 		if (victim != null &&
 				( (p instanceof Pawn && p.getLocation().getX() != dest.getX())
 						|| !(p instanceof Pawn) ) ) {
@@ -102,7 +154,7 @@ public class Board {
 			return (victim != null) ^ (p.getLocation().getX() == dest.getX());
 		} else if (p instanceof Rook
 				|| p instanceof Knight
-		 		|| p instanceof Bishop
+				|| p instanceof Bishop
 				|| p instanceof Queen
 				|| p instanceof King) {
 			return true;
@@ -124,11 +176,42 @@ public class Board {
 		setSquare(from, null);
 
 		if (p instanceof Pawn && ((Pawn) p).shouldPromote()) { //Promote pawn to queen.
-			setSquare(to, new Queen(p.getColor()));
+			p = new Queen(p.getColor());
+			setSquare(to, p);
 		}
 
+		PostPieceMoveEvent post = new PostPieceMoveEvent(p);
+		EventRegistry.callEvents(post);
 		return true;
 	}
+
+	public boolean isInCheck(King king) {
+		for (Piece piece : getAllPieces(king.getColor().getOpposite())) {
+			if (pieceCreatesCheck(piece, king)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public boolean pieceCreatesCheck(Piece piece) {
+		King king = getKing(piece.getColor().getOpposite());
+		return pieceCreatesCheck(piece, king);
+	}
+
+	public boolean pieceCreatesCheck(Piece piece, King king) {
+		if (!piece.validateMove(king.getLocation()))
+			return false;
+		try {
+			validateMove(piece, king.getLocation());
+		} catch (UnsupportedOperationException e) {
+			return true;
+		}
+
+		return false;
+	}
+
 
 	@Override
 	public String toString() {
