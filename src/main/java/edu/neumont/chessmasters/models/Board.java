@@ -23,6 +23,7 @@ public class Board {
 
 	public void setSquare(Location l, Piece p) {
 		squares[l.getY()][l.getX()] = p;
+		if (p != null) p.setLocation(l);
 	}
 
 	public King getKing(PieceColor color) {
@@ -138,7 +139,6 @@ public class Board {
 	public boolean placePiece(Piece p, Location l) {
 		if (getSquare(l) != null) return false;
 		setSquare(l, p);
-		p.setLocation(l);
 		return true;
 	}
 
