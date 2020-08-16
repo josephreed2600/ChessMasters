@@ -167,7 +167,7 @@ public class Board {
 			// shouldn't have been able to reach this configuration in the first place
 			if (victim instanceof King)
 				throw new UnsupportedOperationException
-					("An attempt was made to capture a king, indicating that the game was in an illegal state");
+					("An attempt (" + p.getLocation() + " -> " + dest + ") was made to capture a king, indicating that the game was in an illegal state:\n" + this.toString());
 		}
 
 		if (victim != null &&
@@ -239,7 +239,6 @@ public class Board {
 
 		return false;
 	}
-
 
 	@Override
 	public String toString() {
