@@ -22,6 +22,30 @@ public abstract class Piece {
         this(color, "?");
     }
 
+		public static Piece fromFEN(String type) {
+			switch(type) {
+				case "P": return new Pawn(PieceColor.WHITE);
+				case "p": return new Pawn(PieceColor.BLACK);
+
+				case "R": return new Rook(PieceColor.WHITE);
+				case "r": return new Rook(PieceColor.BLACK);
+
+				case "N": return new Knight(PieceColor.WHITE);
+				case "n": return new Knight(PieceColor.BLACK);
+
+				case "B": return new Bishop(PieceColor.WHITE);
+				case "b": return new Bishop(PieceColor.BLACK);
+
+				case "Q": return new Queen(PieceColor.WHITE);
+				case "q": return new Queen(PieceColor.BLACK);
+
+				case "K": return new King(PieceColor.WHITE);
+				case "k": return new King(PieceColor.BLACK);
+									
+				default: throw new UnsupportedOperationException("Unrecognized piece type: " + type);
+			}
+		}
+
     public String getName() {
         return this.getClass().getSimpleName();
     }

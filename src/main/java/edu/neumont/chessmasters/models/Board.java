@@ -100,7 +100,35 @@ public class Board {
 
 	// create board with pawns
 	public Board() {
-		this(true);
+		//this(true);
+		this("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	}
+
+	// create board from FEN
+	public Board(String fen) {
+		this.squares = new Piece[8][8];
+
+		String[] components = fen.split(" ");
+		String layout = components[0];
+		int index = 63; // iterate through the board
+		for (Character p : layout.toCharArray()) {
+			if (p == '/') continue;
+
+			int rank = index / 8;
+			int file = 7 - (index % 8);
+			index--;
+
+			try {
+				index -= Integer.parseInt(p.toString()) - 1;
+				continue;
+			} catch (NumberFormatException nfe) {
+				try {
+					setSquare(new Location(file, rank), Piece.fromFEN(p.toString()));
+				} catch (UnsupportedOperationException uoe) {
+					throw new IllegalArgumentException("Invalid character in FEN string: " + p);
+				}
+			}
+		}
 	}
 
 	public void clearBoard() {
