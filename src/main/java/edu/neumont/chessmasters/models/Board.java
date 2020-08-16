@@ -191,8 +191,47 @@ public class Board {
 		}
 	}
 
+	// Returns whether the given color is in checkmate.
+	public boolean isInCheckmate(PieceColor color) {
+		return isInCheckmate(getKing(color));
+	}
+	public boolean isInCheckmate(King king) {
+		if (!isInCheck(king)) return false;
+		for (int rank_from = 0; rank_from < 8; rank_from++) {
+			for (int file_from = 0; file_from < 8; file_from++) {
+
+				Location from = new Location(file_from, rank_from);
+				Piece p = getSquare(from);
+
+				if (p == null || p.getColor() != king.getColor()) continue;
+
+				for (int rank_to = 0; rank_to < 8; rank_to++) {
+					for (int file_to = 0; file_to < 8; file_to++) {
+
+						Location to = new Location(file_to, rank_to);
+						if (from.equals(to)) continue;
+
+						Board b = new Board(this);
+						try {
+						if (b.movePiece(from, to) && !b.isInCheck(king.getColor()))
+							// we found a move that's valid and removes us from check
+							return false; // so we're not in checkmate
+						} catch (UnsupportedOperationException uoe) {
+							continue;
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
+
 	public boolean movePiece(String from, String to) {
 		return movePiece(new Location(from), new Location(to));
+	}
+
+	public boolean movePiece(Move move) {
+		return movePiece(move.from, move.to);
 	}
 
 	public boolean movePiece(Location from, Location to) {
@@ -211,6 +250,10 @@ public class Board {
 		PostPieceMoveEvent post = new PostPieceMoveEvent(p);
 		EventRegistry.callEvents(post);
 		return true;
+	}
+
+	public boolean isInCheck(PieceColor color) {
+		return isInCheck(getKing(color));
 	}
 
 	public boolean isInCheck(King king) {
