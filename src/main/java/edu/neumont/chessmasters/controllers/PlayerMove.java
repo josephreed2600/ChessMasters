@@ -9,9 +9,9 @@ import java.util.regex.Pattern;
 
 public class PlayerMove {
 
-    private Board board;
+    private        Board      board;
     private static PlayerMove inst;
-    public int counter = 0;
+    public         int        counter = 0;
 
     public PlayerMove(Board board) {
         inst = this;
@@ -27,45 +27,62 @@ public class PlayerMove {
     }
 
     public void run() {
-        do{
-            MenuPrompt();
-        }while (true);
-
-
-
-
+        boolean keepPlaying;
+        do {
+            keepPlaying = MenuPrompt();
+        } while (keepPlaying);
     }
 
-    public void MenuPrompt() {
+
+    //Returns a boolean dependent on if the player intends to quit the game or not.
+    public boolean MenuPrompt() {
         System.out.println(board);
         StringBuilder sb = new StringBuilder("Welcome to Chess Masters");
         sb.append("\n\n").append("1)Make move \n").append("2)help").append("\n3)quit");
         System.out.println(sb);
-        String input = IOUtils.promptForString("Enter a choice");
-
-
-        boolean check = input.equals("quit");
+        String input;
+        boolean isInt;
 
         do {
+            input = IOUtils.promptForString("Enter a choice");
+            try {
+                Integer.parseInt(input);
+                isInt = true;
+            } catch (NumberFormatException e) {
+                isInt = false;
+            }
+        } while (!isInt && !input.equalsIgnoreCase("quit"));
+
+
+        boolean check = input.equalsIgnoreCase("quit");
+
+        if (!check) {
+            MoveResult result;
             switch (Integer.parseInt(input)) {
                 case 1:
-                    while (!PromptMove()){
+                    while ((result = PromptMove()) == MoveResult.FAILED) {
                         System.out.println("Invalid move try again");
                     }
-                    counter ++;
+
+                    if (result == MoveResult.QUIT)
+                        return false;
+                    counter++;
                     System.out.println(board);
                     break;
                 case 2:
                     helpMenu();
                     break;
+                case 3:
+                    return false;
             }
+            return true;
+        }
 
-        } while (check);
-        QuitGame(input);
-
+        return false;
     }
 
-    public boolean PromptMove() {
+    public MoveResult PromptMove() {
+        MoveResult result = MoveResult.FAILED;
 
         //Prompts user for first location
         boolean checkPiece = true;
@@ -77,15 +94,14 @@ public class PlayerMove {
 
         do {
             positionOne = IOUtils.promptForString("Enter a string: ");
-            QuitGame(positionOne);
+            if (QuitGame(positionOne))
+                return MoveResult.QUIT;
 
             checkPiece = CheckMove(positionOne);
-
 
             //checks if position is true (valid location)
             if (checkPiece) {
                 Piece p = board.getSquare(positionOne);
-
 
                 if (p == null) {
                     checkPiece = false;
@@ -109,38 +125,33 @@ public class PlayerMove {
 
                     }
                 }
-
-
             }
-
         } while (!checkPiece);
 
 
-
-        do{
+        do {
             System.out.println("Position You want to move piece Ex: A2");
             positionTwo = IOUtils.promptForString("Enter a string  ");
-            QuitGame(positionTwo);
+            if (QuitGame(positionTwo))
+                return MoveResult.QUIT;
 
             checkSecond = CheckMove(positionTwo);
-            if(!checkSecond){
+            if (!checkSecond) {
                 System.out.println("You have chosen an incorrect location ");
             }
-        }while (!checkSecond);
+        } while (!checkSecond);
 
 
         //System.out.println(positionOne);
 
 
+        if (result != MoveResult.QUIT) {
+            //Checks users input is a valid position.
+            boolean c = board.movePiece(positionOne, positionTwo);
+            result = c ? MoveResult.MOVED : MoveResult.FAILED;
+        }
 
-
-
-        //Checks users input is a valid position.
-        boolean c = board.movePiece(positionOne, positionTwo);
-
-        return c;
-
-
+        return result;
     }
 
     private boolean CheckMove(String po1) {
@@ -150,13 +161,16 @@ public class PlayerMove {
 
     }
 
-    private void QuitGame(String s) {
+    private boolean QuitGame(String s) {
         String quit = "quit";
 
         if (s.equals(quit)) {
             System.out.println("You have given up because you do not want to play");
-            System.exit(0);
+            return true;
+//            System.exit(0);
         }
+
+        return false;
     }
 
     private void helpMenu() {
@@ -168,5 +182,11 @@ public class PlayerMove {
         MenuPrompt();
     }
 
+
+    public enum MoveResult {
+        QUIT,
+        MOVED,
+        FAILED
+    }
 
 }
