@@ -26,6 +26,10 @@ public class Board {
 		if (p != null) p.setLocation(l);
 	}
 
+	// Indicates whether to fire events. Ghost boards are used in determining checkmate,
+	// so we don't want to issue alerts of captures made on them.
+	public final boolean isGhostBoard;
+
 	public King getKing(PieceColor color) {
 		for (int y = 0; y < 8; y++) {
 			for (int x = 0; x < 8; x++) {
@@ -57,6 +61,7 @@ public class Board {
 		return pieces;
 	}
 
+	/*
 	public Board(boolean withPawns) {
 		this.squares = new Piece[8][8];
 
@@ -84,10 +89,15 @@ public class Board {
 		placePiece(new Knight(PieceColor.BLACK), new Location("g8"));
 		placePiece(new   Rook(PieceColor.BLACK), new Location("h8"));
 	}
+	*/
 
-	// copy ctor
+	// copy ctors
 	public Board(Board original) {
+		this(original, true);
+	}
+	public Board(Board original, boolean isGhost) {
 		this.squares = new Piece[8][8];
+		this.isGhostBoard = isGhost;
 
 		// copy pieces over
 		for (int rank = 0; rank < 8; rank++) {
@@ -101,13 +111,13 @@ public class Board {
 
 	// create board with pawns
 	public Board() {
-		//this(true);
 		this("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	}
 
 	// create board from FEN
 	public Board(String fen) {
 		this.squares = new Piece[8][8];
+		this.isGhostBoard = false;
 
 		String[] components = fen.split(" ");
 		String layout = components[0];
@@ -173,8 +183,10 @@ public class Board {
 		if (victim != null &&
 				( (p instanceof Pawn && p.getLocation().getX() != dest.getX())
 						|| !(p instanceof Pawn) ) ) {
-			PieceCaptureEvent event = new PieceCaptureEvent(p, victim); //Fire our capture event when a piece is captured.
-			EventRegistry.callEvents(event);
+			if (!this.isGhostBoard) {
+				PieceCaptureEvent event = new PieceCaptureEvent(p, victim); //Fire our capture event when a piece is captured.
+				EventRegistry.callEvents(event);
+			}
 		}
 
 		if (p instanceof Pawn) {
@@ -211,7 +223,7 @@ public class Board {
 						Location to = new Location(file_to, rank_to);
 						if (from.equals(to)) continue;
 
-						Board b = new Board(this);
+						Board b = new Board(this, true);
 						try {
 						if (b.movePiece(from, to) && !b.isInCheck(king.getColor()))
 							// we found a move that's valid and removes us from check
@@ -238,7 +250,7 @@ public class Board {
 		Piece p = getSquare(from);
 		if (p == null) return false;
 		if (!validateMove(p, to)) return false;
-		if (!p.move(to)) return false;
+		if (!p.move(to, this.isGhostBoard)) return false;
 		setSquare(to, p);
 		setSquare(from, null);
 
@@ -247,8 +259,10 @@ public class Board {
 			setSquare(to, p);
 		}
 
-		PostPieceMoveEvent post = new PostPieceMoveEvent(p);
-		EventRegistry.callEvents(post);
+		if (!this.isGhostBoard) {
+			PostPieceMoveEvent post = new PostPieceMoveEvent(p);
+			EventRegistry.callEvents(post);
+		}
 		return true;
 	}
 

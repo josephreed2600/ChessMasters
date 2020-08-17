@@ -84,12 +84,15 @@ public abstract class Piece {
      * @param location The coordinate location of the position to move to (ie 'a2')
      * @return boolean - Whether or not the move has been made.
      */
-    public boolean move(String location) {
+		public boolean move(String location) { return move(location, false); }
+    public boolean move(String location, boolean quiet) {
         location = location.toLowerCase();
 
-        //We have to make sure to CALL our events
-        PrePieceMoveEvent event = new PrePieceMoveEvent(this, new Location(location));
-        EventRegistry.callEvents(event);
+				PrePieceMoveEvent event = new PrePieceMoveEvent(this, new Location(location));
+				if(!quiet) {
+					//We have to make sure to CALL our events
+					EventRegistry.callEvents(event);
+				}
 
         if(event.isCancelled())
             return false;
@@ -104,9 +107,8 @@ public abstract class Piece {
         return true;
     }
 
-    public boolean move(Location location) {
-        return move(location.toString());
-    }
+    public boolean move(Location location) { return move(location, false); }
+    public boolean move(Location location, boolean quiet) { return move(location.toString(), quiet); }
 
     public boolean validateMove(Location location) {
         return validateMove(location.toString());

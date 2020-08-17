@@ -5,6 +5,7 @@ import edu.neumont.chessmasters.controllers.PlayerMove;
 import edu.neumont.chessmasters.models.Board;
 import edu.neumont.chessmasters.models.pieces.King;
 import edu.neumont.chessmasters.models.pieces.Piece;
+import edu.neumont.chessmasters.models.pieces.PieceColor;
 
 public class EventListener {
 
@@ -13,7 +14,7 @@ public class EventListener {
         PlayerMove move = PlayerMove.inst();
         Board tempBoard = new Board(move.getBoard());
         King king = tempBoard.getKing(event.getPiece().getColor());
-        if (tempBoard.isInCheck(king)) {
+        if (!move.getBoard().isGhostBoard && tempBoard.isInCheck(king)) {
 
             if(king.getLocation().equals(event.getPiece().getLocation())) {
                 king.setLocation(event.getPassedLocation());
@@ -32,6 +33,9 @@ public class EventListener {
         boolean check = PlayerMove.inst().getBoard().pieceCreatesCheck(event.getPiece());
         if (check)
             System.out.println("\nCHECK!");
+        boolean checkmate = PlayerMove.inst().getBoard().isInCheckmate(event.getPiece().getColor() == PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE);
+        if (check)
+            System.out.println("\nCHECKMATE! " + (event.getPiece().getColor() == PieceColor.WHITE ? "1-0" : "0-1"));
     }
 
     @EventHandler
