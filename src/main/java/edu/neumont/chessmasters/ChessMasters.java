@@ -14,6 +14,7 @@ import java.security.CodeSource;
 public class ChessMasters {
 
     public static boolean debug = false;
+    public static PlayerMove controller;
 
     private static boolean arrayContains(String[] arr, String test) {
         for (String s : arr) {
@@ -47,7 +48,8 @@ public class ChessMasters {
         do {
             //Run setup here.
             Board board = new Board();
-            new PlayerMove(board).run();
+            controller = new PlayerMove(board);
+            controller.run();
             playAgain = IOUtils.promptForBoolean("Play again? (y/n)", "y", "n");
         } while (playAgain);
         System.out.println("Goodbye");

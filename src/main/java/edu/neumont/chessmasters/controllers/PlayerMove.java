@@ -11,7 +11,9 @@ public class PlayerMove {
 
     private        Board      board;
     private static PlayerMove inst;
-    public         int        counter = 0;
+    private        int        counter  = 0;
+    private        String     status   = null;
+    private        boolean    gameOver = false;
 
     public PlayerMove(Board board) {
         inst = this;
@@ -27,24 +29,43 @@ public class PlayerMove {
     }
 
     public void run() {
+        gameOver = false;
         boolean keepPlaying;
         do {
             keepPlaying = MenuPrompt();
         } while (keepPlaying);
     }
 
+    public void setGameOver() {
+        this.gameOver = true;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 
     //Returns a boolean dependent on if the player intends to quit the game or not.
     public boolean MenuPrompt() {
         System.out.println(board);
-        StringBuilder sb = new StringBuilder("Welcome to Chess Masters");
-        sb.append("\n\n").append("1)Make move \n").append("2)help").append("\n3)quit");
+        if (status != null) {
+            System.out.println(status);
+            setStatus(null);
+        }
+        if (gameOver)
+            return false;
+
+        StringBuilder sb = new StringBuilder();
+        if (counter == 0)
+            sb.append("Welcome to Chess Masters");
+        sb.append("\n\n").append(counter % 2 == 0 ? "White" : "Black").append(", it's your turn:")
+                .append("\n1) Make Move \n").append("2) Help").append("\n3) Quit");
         System.out.println(sb);
         String input;
         boolean isInt;
 
         do {
-            input = IOUtils.promptForString("Enter a choice");
+            input = IOUtils.promptForString("Enter a choice:");
             try {
                 Integer.parseInt(input);
                 isInt = true;
@@ -67,7 +88,6 @@ public class PlayerMove {
                     if (result == MoveResult.QUIT)
                         return false;
                     counter++;
-                    System.out.println(board);
                     break;
                 case 2:
                     helpMenu();
