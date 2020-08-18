@@ -95,6 +95,7 @@ public class Board {
 	public Board(Board original) {
 		this(original, true);
 	}
+
 	public Board(Board original, boolean isGhost) {
 		this.squares = new Piece[8][8];
 		this.isGhostBoard = isGhost;
@@ -104,7 +105,8 @@ public class Board {
 			for (int file = 0; file < 8; file++) {
 				Location l = new Location(file, rank);
 				Piece p = original.getSquare(l);
-				this.setSquare(l, p);
+				if (p != null)
+					this.setSquare(l, p.clone());
 			}
 		}
 	}

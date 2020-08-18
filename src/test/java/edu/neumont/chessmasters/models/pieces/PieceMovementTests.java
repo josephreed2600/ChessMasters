@@ -1,11 +1,19 @@
 package edu.neumont.chessmasters.models.pieces;
 
+import edu.neumont.chessmasters.controllers.PlayerMove;
+import edu.neumont.chessmasters.models.Board;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class PieceMovementTests {
+
+    @BeforeAll
+    public static void setup() {
+        PlayerMove controller = new PlayerMove(new Board());
+    }
 
     private boolean test(Piece piece, String position) {
         System.out.println("Testing " + piece.getColor().toString() + " " + piece.getClass().getSimpleName() + " moving from " + piece.getLocation().toString() + " to " + position);
@@ -67,7 +75,7 @@ class PieceMovementTests {
         System.out.println("\nTesting pawn promotion");
         Pawn wPawn = new Pawn(PieceColor.WHITE);
         wPawn.setLocation("A8");
-        assert(wPawn.shouldPromote());
+        assert (wPawn.shouldPromote());
         System.out.println("White pawn at A8 should be promoted.");
         wPawn.setLocation("A7");
         assertFalse(wPawn.shouldPromote());
@@ -78,7 +86,7 @@ class PieceMovementTests {
 
         Pawn bPawn = new Pawn(PieceColor.BLACK);
         bPawn.setLocation("A1");
-        assert(bPawn.shouldPromote());
+        assert (bPawn.shouldPromote());
         System.out.println("Black pawn at A1 should be promoted.");
         bPawn.setLocation("A2");
         assertFalse(bPawn.shouldPromote());
