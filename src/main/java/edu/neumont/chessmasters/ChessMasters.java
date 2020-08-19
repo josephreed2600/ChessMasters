@@ -46,6 +46,13 @@ public class ChessMasters {
 
     public static void startGame() {
         boolean playAgain;
+        if(System.console() == null) {
+            System.out.println(" ----[ IMPORTANT ]----\n" +
+                    "This game session is not directly attached to a Console object. (Either stdin or stdout is being redirected.)\n" +
+                    "If you enter a null string for any prompt, the application WILL terminate.\n" +
+                    "Chances are, you know what you're doing, but if you accessed the application in a normal way, please let the developers know that you're receiving this error.\n");
+        }
+
         try {
             do {
                 //Run setup here.
