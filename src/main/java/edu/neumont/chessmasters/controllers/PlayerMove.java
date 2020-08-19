@@ -18,6 +18,10 @@ public class PlayerMove {
     public         String     positionOne;
     public         String     positionTwo;
 
+    public PlayerMove() {
+        this(new Board());
+    }
+
     public PlayerMove(Board board) {
         inst = this;
         this.board = board;
@@ -54,8 +58,6 @@ public class PlayerMove {
         boolean movePieceCheck;
         MoveResult result = null;
         do {
-
-
             if (status != null) {
                 System.out.println(status);
                 setStatus(null);
