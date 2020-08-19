@@ -257,20 +257,41 @@ public class Board {
 		Piece p = getSquare(from);
 		if (p == null) return false;
 		if (!validateMove(p, to)) return false;
-		if (!p.move(to, this.isGhostBoard)) return false;
-		setSquare(to, p);
-		setSquare(from, null);
 
-		if (p instanceof Pawn && ((Pawn) p).shouldPromote()) { //Promote pawn to queen.
-			p = new Queen(p.getColor());
+		if(isCastle(new Move(from, to))) {
+			ChessMasters.controller.setStatus("Castling has not been fully implemented! Hold tight!");
+			return false;
+		} else {
+			if (!p.move(to, this.isGhostBoard)) return false;
 			setSquare(to, p);
-		}
+			setSquare(from, null);
 
-		if (!this.isGhostBoard) {
-			PostPieceMoveEvent post = new PostPieceMoveEvent(p);
-			EventRegistry.callEvents(post);
+			if (p instanceof Pawn && ((Pawn) p).shouldPromote()) { //Promote pawn to queen.
+				p = new Queen(p.getColor());
+				setSquare(to, p);
+			}
+
+			if (!this.isGhostBoard) {
+				PostPieceMoveEvent post = new PostPieceMoveEvent(p);
+				EventRegistry.callEvents(post);
+			}
 		}
 		return true;
+	}
+
+	private boolean isCastle(Move move) {
+		Piece piece = getSquare(move.from);
+		Piece target = getSquare(move.to);
+		if(piece == null || target == null)
+			return false;
+
+		if (piece instanceof King) {
+			if (target != null && target instanceof Rook
+					&& target.getColor() == piece.getColor()) {
+				return piece.getNumMoves() == 0 && target.getNumMoves() == 0;
+			}
+		}
+		return false;
 	}
 
 	public boolean isInCheck(PieceColor color) {
