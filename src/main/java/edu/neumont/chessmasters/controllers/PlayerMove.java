@@ -113,7 +113,7 @@ public class PlayerMove {
 //                                System.out.println(status);
 //                                setStatus(null);
 //                            } else
-//                                System.out.println("Invalid move try again");
+                                setStatus("That move could not be performed.");
                         } else {
                             counter++;
                         }
