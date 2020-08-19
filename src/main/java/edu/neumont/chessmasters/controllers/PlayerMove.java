@@ -50,7 +50,7 @@ public class PlayerMove {
 
     //Returns a boolean dependent on if the player intends to quit the game or not.
     public boolean MenuPrompt() throws EOFException {
-        System.out.println(board);
+        System.out.println("\n" + board);
         boolean movePieceCheck;
         MoveResult result = null;
         do {
