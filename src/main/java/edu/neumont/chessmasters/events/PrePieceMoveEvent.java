@@ -21,13 +21,13 @@ public class PrePieceMoveEvent extends Event {
         this.location = location;
         this.passedLocation = location;
 
-        if (piece instanceof King) {
-            Piece target = board.getSquare(location);
-            if (target != null && target instanceof Rook
-                    && target.getColor() == piece.getColor()) {
-                isCastle = piece.getNumMoves() == 0 && target.getNumMoves() == 0;
-            }
-        }
+//        if (piece instanceof King) {
+//            Piece target = board.getSquare(location);
+//            if (target != null && target instanceof Rook
+//                    && target.getColor() == piece.getColor()) {
+//                isCastle = piece.getNumMoves() == 0 && target.getNumMoves() == 0;
+//            }
+//        }
     }
 
     public Piece getPiece() {
