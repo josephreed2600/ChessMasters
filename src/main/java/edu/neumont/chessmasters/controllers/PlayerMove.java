@@ -103,7 +103,12 @@ public class PlayerMove {
                 case 1:
                     while ((result = PromptMove()) == MoveResult.FAILED) {
 
-                        System.out.println("Invalid move try again");
+                        if (status != null) {
+                            System.out.println(status);
+                            setStatus(null);
+                        } else
+                            System.out.println("Invalid move try again");
+
                     }
 
                     if (result == MoveResult.QUIT)

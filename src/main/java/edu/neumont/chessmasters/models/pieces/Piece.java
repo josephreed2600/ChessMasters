@@ -1,8 +1,10 @@
 package edu.neumont.chessmasters.models.pieces;
 
 import edu.neumont.chessmasters.Utils;
+import edu.neumont.chessmasters.controllers.PlayerMove;
 import edu.neumont.chessmasters.events.EventRegistry;
 import edu.neumont.chessmasters.events.PrePieceMoveEvent;
+import edu.neumont.chessmasters.models.Board;
 import edu.neumont.chessmasters.models.Location;
 
 public abstract class Piece {
@@ -22,29 +24,42 @@ public abstract class Piece {
         this(color, "?");
     }
 
-		public static Piece fromFEN(String type) {
-			switch(type) {
-				case "P": return new Pawn(PieceColor.WHITE);
-				case "p": return new Pawn(PieceColor.BLACK);
+    public static Piece fromFEN(String type) {
+        switch (type) {
+            case "P":
+                return new Pawn(PieceColor.WHITE);
+            case "p":
+                return new Pawn(PieceColor.BLACK);
 
-				case "R": return new Rook(PieceColor.WHITE);
-				case "r": return new Rook(PieceColor.BLACK);
+            case "R":
+                return new Rook(PieceColor.WHITE);
+            case "r":
+                return new Rook(PieceColor.BLACK);
 
-				case "N": return new Knight(PieceColor.WHITE);
-				case "n": return new Knight(PieceColor.BLACK);
+            case "N":
+                return new Knight(PieceColor.WHITE);
+            case "n":
+                return new Knight(PieceColor.BLACK);
 
-				case "B": return new Bishop(PieceColor.WHITE);
-				case "b": return new Bishop(PieceColor.BLACK);
+            case "B":
+                return new Bishop(PieceColor.WHITE);
+            case "b":
+                return new Bishop(PieceColor.BLACK);
 
-				case "Q": return new Queen(PieceColor.WHITE);
-				case "q": return new Queen(PieceColor.BLACK);
+            case "Q":
+                return new Queen(PieceColor.WHITE);
+            case "q":
+                return new Queen(PieceColor.BLACK);
 
-				case "K": return new King(PieceColor.WHITE);
-				case "k": return new King(PieceColor.BLACK);
-									
-				default: throw new UnsupportedOperationException("Unrecognized piece type: " + type);
-			}
-		}
+            case "K":
+                return new King(PieceColor.WHITE);
+            case "k":
+                return new King(PieceColor.BLACK);
+
+            default:
+                throw new UnsupportedOperationException("Unrecognized piece type: " + type);
+        }
+    }
 
     public String getName() {
         return this.getClass().getSimpleName();
@@ -84,17 +99,18 @@ public abstract class Piece {
      * @param location The coordinate location of the position to move to (ie 'a2')
      * @return boolean - Whether or not the move has been made.
      */
-		public boolean move(String location) { return move(location, false); }
+    public boolean move(String location) {
+        return move(location, false);
+    }
+
     public boolean move(String location, boolean quiet) {
-        location = location.toLowerCase();
+        PrePieceMoveEvent event = new PrePieceMoveEvent(this, new Location(location), !quiet ? PlayerMove.inst().getBoard() : new Board(PlayerMove.inst().getBoard()));
+        if (!quiet) {
+            //We have to make sure to CALL our events
+            EventRegistry.callEvents(event);
+        }
 
-				PrePieceMoveEvent event = new PrePieceMoveEvent(this, new Location(location));
-				if(!quiet) {
-					//We have to make sure to CALL our events
-					EventRegistry.callEvents(event);
-				}
-
-        if(event.isCancelled())
+        if (event.isCancelled())
             return false;
 
         location = event.getLocation().toString();
@@ -107,14 +123,34 @@ public abstract class Piece {
         return true;
     }
 
-    public boolean move(Location location) { return move(location, false); }
-    public boolean move(Location location, boolean quiet) { return move(location.toString(), quiet); }
+    public boolean move(Location location) {
+        return move(location, false);
+    }
+
+    public boolean move(Location location, boolean quiet) {
+        return move(location.toString(), quiet);
+    }
+
+    public Piece clone() {
+        Piece piece = Piece.fromFEN(getNotation());
+
+        piece.setLocation(this.getLocation());
+        piece.setNumMoves(this.getNumMoves());
+
+        return piece;
+    }
 
     public boolean validateMove(Location location) {
         return validateMove(location.toString());
     }
 
     public abstract boolean validateMove(String move);
+
+    public String getNotation() {
+        return getColor() == PieceColor.WHITE
+                ? this.notation.toUpperCase()
+                : this.notation.toLowerCase();
+    }
 
     @Override
     public String toString() {

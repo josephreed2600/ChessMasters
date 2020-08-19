@@ -12,36 +12,41 @@ public class EventListener {
 
     @EventHandler
     public void preMove(PrePieceMoveEvent event) {
-        PlayerMove move = PlayerMove.inst();
-        Board tempBoard = new Board(move.getBoard());
+//        PlayerMove move = PlayerMove.inst();
+        Board tempBoard = new Board(event.getBoard());
         King king = tempBoard.getKing(event.getPiece().getColor());
-        if (!move.getBoard().isGhostBoard && tempBoard.isInCheck(king)) {
+        boolean initialCheck = tempBoard.isInCheck(king);
+//        if (!event.getBoard().isGhostBoard && initialCheck) {
+        if (king.getLocation().equals(event.getPiece().getLocation())) {
+            king.setLocation(event.getPassedLocation());
+        }
 
-            if (king.getLocation().equals(event.getPiece().getLocation())) {
-                king.setLocation(event.getPassedLocation());
-            }
-            tempBoard.setSquare(event.getFrom(), null);
-            tempBoard.setSquare(event.getPassedLocation(), event.getPiece());
-            if (tempBoard.isInCheck(king)) {
+        tempBoard.setSquare(event.getFrom(), null);
+        tempBoard.setSquare(event.getPassedLocation(), event.getPiece().clone());
+//        }
+
+        if (tempBoard.isInCheck(king)) {
+            if (initialCheck)
                 ChessMasters.controller.setStatus("\nYour king would still be in check with that move. Try moving another piece.");
-//                System.out.println("\nYour king would still be in check with that move. Try moving another piece.");
-                event.setCancelled(true);
-            }
+            else
+                ChessMasters.controller.setStatus("\nThat move would put your king in danger! Try moving another piece.");
+            event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void move(PostPieceMoveEvent event) {
-        boolean check = PlayerMove.inst().getBoard().pieceCreatesCheck(event.getPiece());
-        if (check)
+        boolean check = PlayerMove.inst().getBoard().isInCheck(event.getPiece().getColor().getOpposite());//PlayerMove.inst().getBoard().pieceCreatesCheck(event.getPiece());
+        if (check) {
             ChessMasters.controller.setStatus("\nCHECK");
-//            System.out.println("\nCHECK!");
-        boolean checkmate = PlayerMove.inst().getBoard().isInCheckmate(event.getPiece().getColor() == PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE);
-        if (checkmate) {
-            ChessMasters.controller.setStatus("\nCHECKMATE! " + (event.getPiece().getColor() == PieceColor.WHITE ? "1-0" : "0-1"));
-            ChessMasters.controller.setGameOver();
         }
-//            System.out.println("\nCHECKMATE! " + (event.getPiece().getColor() == PieceColor.WHITE ? "1-0" : "0-1"));
+        boolean checkmate = PlayerMove.inst().getBoard().isInCheckmate(event.getPiece().getColor().getOpposite());
+        if (check) {
+            if (checkmate) {
+                ChessMasters.controller.setStatus("\nCHECKMATE! " + (event.getPiece().getColor() == PieceColor.WHITE ? "1-0" : "0-1"));
+                ChessMasters.controller.setGameOver();
+            }
+        }
     }
 
     @EventHandler
