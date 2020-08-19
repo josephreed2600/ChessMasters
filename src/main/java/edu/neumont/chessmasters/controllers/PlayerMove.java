@@ -75,6 +75,8 @@ public class PlayerMove {
 
             do {
 
+                positionOne = null;
+                positionTwo = null;
                 input = IOUtils.promptForString("Enter a choice: ");
                 movePieceCheck = Pattern.matches("[A-Ha-h][1-8][\\s][A-Ha-h][1-8]", input);
 
@@ -107,11 +109,11 @@ public class PlayerMove {
                     case 1:
                         result = (positionOne == null || positionTwo == null) ? MoveResult.FAILED : PromptMove();
                         if (result == MoveResult.FAILED) {
-                            if (status != null) {
-                                System.out.println(status);
-                                setStatus(null);
-                            } else
-                                System.out.println("Invalid move try again");
+//                            if (status != null) {
+//                                System.out.println(status);
+//                                setStatus(null);
+//                            } else
+//                                System.out.println("Invalid move try again");
                         } else {
                             counter++;
                         }
@@ -139,54 +141,52 @@ public class PlayerMove {
         //System.out.println("\nWhich piece do you want to move based on location {Ex: A1}");
 
 
-        do {
-            //positionOne = IOUtils.promptForString("Enter a string: ");
-            if (QuitGame(positionOne))
-                return MoveResult.QUIT;
+//        do {
+        //positionOne = IOUtils.promptForString("Enter a string: ");
+        checkPiece = CheckMove(positionOne);
 
-            checkPiece = CheckMove(positionOne);
+        //checks if position is true (valid location)
+        if (checkPiece) {
+            Piece p = board.getSquare(positionOne);
 
-            //checks if position is true (valid location)
-            if (checkPiece) {
-                Piece p = board.getSquare(positionOne);
+            if (p == null) {
+                checkPiece = false;
+                setStatus("no piece here");
+                return MoveResult.FAILED;
+            } else {
+                PieceColor colorPiece = p.getColor();
 
-                if (p == null) {
-                    checkPiece = false;
-                    System.out.println("no piece here");
-                } else {
-                    PieceColor colorPiece = p.getColor();
-
-                    if (counter % 2 == 0) {
-                        //Checking white piece
-                        if (colorPiece != PieceColor.WHITE) {
-                            checkPiece = false;
-                            System.out.println("wrong piece color");
-                        }
-
-                    } else {
-                        //Checking black turn {Piece}
-                        if (colorPiece != PieceColor.BLACK) {
-                            checkPiece = false;
-                            System.out.println("wrong piece color");
-                        }
-
+                if (counter % 2 == 0) {
+                    //Checking white piece
+                    if (colorPiece != PieceColor.WHITE) {
+                        checkPiece = false;
+                        setStatus("wrong piece color");
+                        return MoveResult.FAILED;
                     }
+
+                } else {
+                    //Checking black turn {Piece}
+                    if (colorPiece != PieceColor.BLACK) {
+                        checkPiece = false;
+                        setStatus("wrong piece color");
+                        return MoveResult.FAILED;
+                    }
+
                 }
             }
-        } while (!checkPiece);
+        }
+//        } while (!checkPiece);
 
 
-        do {
-            //System.out.println("Position You want to move piece Ex: A2");
-            //positionTwo = IOUtils.promptForString("Enter a string  ");
-            if (QuitGame(positionTwo))
-                return MoveResult.QUIT;
-
-            checkSecond = CheckMove(positionTwo);
-            if (!checkSecond) {
-                System.out.println("You have chosen an incorrect location ");
-            }
-        } while (!checkSecond);
+//        do {
+        //System.out.println("Position You want to move piece Ex: A2");
+        //positionTwo = IOUtils.promptForString("Enter a string  ");
+        checkSecond = CheckMove(positionTwo);
+        if (!checkSecond) {
+            setStatus("You have chosen an incorrect location ");
+            return MoveResult.FAILED;
+        }
+//        } while (!checkSecond);
 
 
         //System.out.println(positionOne);
