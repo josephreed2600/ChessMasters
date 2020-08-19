@@ -6,6 +6,7 @@ import edu.neumont.chessmasters.events.EventRegistry;
 import edu.neumont.chessmasters.models.Board;
 import me.travja.utils.utils.IOUtils;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -13,7 +14,7 @@ import java.security.CodeSource;
 
 public class ChessMasters {
 
-    public static boolean debug = false;
+    public static boolean    debug = false;
     public static PlayerMove controller;
 
     private static boolean arrayContains(String[] arr, String test) {
@@ -45,13 +46,17 @@ public class ChessMasters {
 
     public static void startGame() {
         boolean playAgain;
-        do {
-            //Run setup here.
-            Board board = new Board();
-            controller = new PlayerMove(board);
-            controller.run();
-            playAgain = IOUtils.promptForBoolean("Play again? (y/n)", "y", "n");
-        } while (playAgain);
+        try {
+            do {
+                //Run setup here.
+                Board board = new Board();
+                controller = new PlayerMove(board);
+                controller.run();
+                playAgain = IOUtils.promptForBoolean("Play again? (y/n)", "y", "n");
+            } while (playAgain);
+        } catch (EOFException e) {
+            System.err.println("Input stream was terminated. Exiting program.");
+        }
         System.out.println("Goodbye");
     }
 

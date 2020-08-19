@@ -5,17 +5,18 @@ import edu.neumont.chessmasters.models.pieces.Piece;
 import edu.neumont.chessmasters.models.pieces.PieceColor;
 import me.travja.utils.utils.IOUtils;
 
+import java.io.EOFException;
 import java.util.regex.Pattern;
 
 public class PlayerMove {
 
-    private Board board;
+    private        Board      board;
     private static PlayerMove inst;
-    private int counter = 0;
-    private String status = null;
-    private boolean gameOver = false;
-    public String positionOne;
-    public String positionTwo;
+    private        int        counter  = 0;
+    private        String     status   = null;
+    private        boolean    gameOver = false;
+    public         String     positionOne;
+    public         String     positionTwo;
 
     public PlayerMove(Board board) {
         inst = this;
@@ -30,7 +31,7 @@ public class PlayerMove {
         return board;
     }
 
-    public void run() {
+    public void run() throws EOFException {
         gameOver = false;
         boolean keepPlaying;
         do {
@@ -48,7 +49,7 @@ public class PlayerMove {
 
 
     //Returns a boolean dependent on if the player intends to quit the game or not.
-    public boolean MenuPrompt() {
+    public boolean MenuPrompt() throws EOFException {
         System.out.println(board);
         boolean movePieceCheck;
         MoveResult result = null;
@@ -111,8 +112,7 @@ public class PlayerMove {
                                 setStatus(null);
                             } else
                                 System.out.println("Invalid move try again");
-                        }
-                        else {
+                        } else {
                             counter++;
                         }
 
@@ -220,7 +220,7 @@ public class PlayerMove {
         return false;
     }
 
-    private void helpMenu() {
+    private void helpMenu() throws EOFException {
         StringBuilder helper = new StringBuilder("Helper commands");
 
         helper.append("\n\nWhen inputting a position only give two characters:\n Ex) A2 A4").append("\nTo quit/forfeit the game simply type quit whenever\n");
