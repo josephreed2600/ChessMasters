@@ -9,11 +9,13 @@ import java.util.regex.Pattern;
 
 public class PlayerMove {
 
-    private        Board      board;
+    private Board board;
     private static PlayerMove inst;
-    private        int        counter  = 0;
-    private        String     status   = null;
-    private        boolean    gameOver = false;
+    private int counter = 0;
+    private String status = null;
+    private boolean gameOver = false;
+    public String positionOne;
+    public String positionTwo;
 
     public PlayerMove(Board board) {
         inst = this;
@@ -48,6 +50,7 @@ public class PlayerMove {
     //Returns a boolean dependent on if the player intends to quit the game or not.
     public boolean MenuPrompt() {
         System.out.println(board);
+        boolean movePieceCheck;
         if (status != null) {
             System.out.println(status);
             setStatus(null);
@@ -58,14 +61,31 @@ public class PlayerMove {
         StringBuilder sb = new StringBuilder();
         if (counter == 0)
             sb.append("Welcome to Chess Masters");
-        sb.append("\n\n").append(counter % 2 == 0 ? "White" : "Black").append(", it's your turn:")
-                .append("\n1) Make Move \n").append("2) Help").append("\n3) Quit");
+        sb.append("\n\n").append(counter % 2 == 0 ? "White" : "Black").append(", it's your turn:");
+
         System.out.println(sb);
         String input;
         boolean isInt;
 
+
         do {
-            input = IOUtils.promptForString("Enter a choice:");
+
+            input = IOUtils.promptForString("Enter a choice: ");
+            movePieceCheck = Pattern.matches("[A-Ha-h][1-8][\\s][A-Ha-h][1-8]", input);
+
+            if (movePieceCheck) {
+                String[] text = input.split(Pattern.quote(" "));
+                positionOne = text[0];
+                positionTwo = text[1];
+
+                input = "1";
+            } else if (input.equals("quit")) {
+                QuitGame(input);
+            } else if (input.equals("help")) {
+                input = "2";
+            }
+
+
             try {
                 Integer.parseInt(input);
                 isInt = true;
@@ -82,6 +102,7 @@ public class PlayerMove {
             switch (Integer.parseInt(input)) {
                 case 1:
                     while ((result = PromptMove()) == MoveResult.FAILED) {
+
                         System.out.println("Invalid move try again");
                     }
 
@@ -107,13 +128,11 @@ public class PlayerMove {
         //Prompts user for first location
         boolean checkPiece = true;
         boolean checkSecond = true;
-        System.out.println("\nWhich piece do you want to move based on location {Ex: A1}");
-        String positionOne = null;
-        String positionTwo = null;
+        //System.out.println("\nWhich piece do you want to move based on location {Ex: A1}");
 
 
         do {
-            positionOne = IOUtils.promptForString("Enter a string: ");
+            //positionOne = IOUtils.promptForString("Enter a string: ");
             if (QuitGame(positionOne))
                 return MoveResult.QUIT;
 
@@ -150,8 +169,8 @@ public class PlayerMove {
 
 
         do {
-            System.out.println("Position You want to move piece Ex: A2");
-            positionTwo = IOUtils.promptForString("Enter a string  ");
+            //System.out.println("Position You want to move piece Ex: A2");
+            //positionTwo = IOUtils.promptForString("Enter a string  ");
             if (QuitGame(positionTwo))
                 return MoveResult.QUIT;
 
@@ -196,7 +215,7 @@ public class PlayerMove {
     private void helpMenu() {
         StringBuilder helper = new StringBuilder("Helper commands");
 
-        helper.append("\n\nWhen inputting a position only give two characters:\n Ex) A2").append("\nTo quit/forfeit the game simply type quit whenever\n");
+        helper.append("\n\nWhen inputting a position only give two characters:\n Ex) A2 A4").append("\nTo quit/forfeit the game simply type quit whenever\n");
         System.out.println(helper);
 
         MenuPrompt();
