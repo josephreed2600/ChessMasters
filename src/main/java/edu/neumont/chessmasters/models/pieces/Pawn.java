@@ -30,4 +30,19 @@ public class Pawn extends Piece {
         return canMove;
     }
 
+    @Override
+    public boolean validateCapture(Location location) {
+        boolean canMove = false;
+
+        int y = getLocation().getY();
+        int newY = location.getY();
+        if ((getColor() == PieceColor.WHITE && newY > y) ||
+                (getColor() == PieceColor.BLACK && newY < y)) {
+            int dx = Math.abs(getLocation().getX() - location.getX());
+            int dy = Math.abs(y - newY);
+            canMove = dx == 1 && dy == 1;
+        }
+
+        return canMove;
+    }
 }

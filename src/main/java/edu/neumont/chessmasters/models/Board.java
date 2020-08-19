@@ -1,5 +1,6 @@
 package edu.neumont.chessmasters.models;
 
+import edu.neumont.chessmasters.ChessMasters;
 import edu.neumont.chessmasters.Utils;
 import edu.neumont.chessmasters.events.EventRegistry;
 import edu.neumont.chessmasters.events.PieceCaptureEvent;
@@ -172,9 +173,13 @@ public class Board {
 		// check whether we're capturing
 		Piece victim = getSquare(dest);
 		if (victim != null) {
+			if (!p.validateCapture(dest) && !isGhostBoard) {
+				ChessMasters.controller.setStatus("You can't capture that piece.");
+				return false;
+			}
 			// if we are, ensure that we're capturing an opponent
 			if (victim.getColor() == p.getColor())
-				return false;
+				return (p instanceof King && victim instanceof Rook);
 			// if we're trying to capture a king, something has gone horribly wrong---we
 			// shouldn't have been able to reach this configuration in the first place
 			if (victim instanceof King)
@@ -288,7 +293,7 @@ public class Board {
 	}
 
 	public boolean pieceCreatesCheck(Piece piece, King king) {
-		if (!piece.validateMove(king.getLocation()))
+		if (!piece.validateCapture(king.getLocation()))
 			return false;
 		try {
 			validateMove(piece, king.getLocation());

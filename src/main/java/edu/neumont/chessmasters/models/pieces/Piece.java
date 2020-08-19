@@ -86,7 +86,7 @@ public abstract class Piece {
     }
 
     public void setLocation(String location) {
-        this.location = new Location(location);
+        setLocation(new Location(location));
     }
 
     /**
@@ -104,6 +104,10 @@ public abstract class Piece {
     }
 
     public boolean move(String location, boolean quiet) {
+        //Validate the passed in location
+        if (this.getLocation() != null && !validateMove(location))
+            return false;
+
         PrePieceMoveEvent event = new PrePieceMoveEvent(this, new Location(location), !quiet ? PlayerMove.inst().getBoard() : new Board(PlayerMove.inst().getBoard()));
         if (!quiet) {
             //We have to make sure to CALL our events
@@ -115,6 +119,7 @@ public abstract class Piece {
 
         location = event.getLocation().toString();
 
+        //Validate the potential new location
         if (this.getLocation() != null && !validateMove(location))
             return false;
 
@@ -145,6 +150,16 @@ public abstract class Piece {
     }
 
     public abstract boolean validateMove(String move);
+
+    /**
+     * Validates that a capture is legal.
+     * This is really most applicable to Pawns as they can't capture where they indeed might be able to move.
+     * @param location
+     * @return
+     */
+    public boolean validateCapture(Location location) {
+        return validateMove(location);
+    }
 
     public String getNotation() {
         return getColor() == PieceColor.WHITE
