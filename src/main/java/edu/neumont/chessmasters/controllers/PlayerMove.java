@@ -51,79 +51,82 @@ public class PlayerMove {
     public boolean MenuPrompt() {
         System.out.println(board);
         boolean movePieceCheck;
-        if (status != null) {
-            System.out.println(status);
-            setStatus(null);
-        }
-        if (gameOver)
-            return false;
-
-        StringBuilder sb = new StringBuilder();
-        if (counter == 0)
-            sb.append("Welcome to Chess Masters");
-        sb.append("\n\n").append(counter % 2 == 0 ? "White" : "Black").append(", it's your turn:");
-
-        System.out.println(sb);
-        String input;
-        boolean isInt;
-
-
+        MoveResult result = null;
         do {
 
-            input = IOUtils.promptForString("Enter a choice: ");
-            movePieceCheck = Pattern.matches("[A-Ha-h][1-8][\\s][A-Ha-h][1-8]", input);
 
-            if (movePieceCheck) {
-                String[] text = input.split(Pattern.quote(" "));
-                positionOne = text[0];
-                positionTwo = text[1];
-
-                input = "1";
-            } else if (input.equals("quit")) {
-                QuitGame(input);
-            } else if (input.equals("help")) {
-                input = "2";
+            if (status != null) {
+                System.out.println(status);
+                setStatus(null);
             }
+            if (gameOver)
+                return false;
+
+            StringBuilder sb = new StringBuilder();
+            if (counter == 0)
+                sb.append("Welcome to Chess Masters");
+            sb.append("\n\n").append(counter % 2 == 0 ? "White" : "Black").append(", it's your turn:");
+
+            System.out.println(sb);
+            String input;
+            boolean isInt;
 
 
-            try {
-                Integer.parseInt(input);
-                isInt = true;
-            } catch (NumberFormatException e) {
-                isInt = false;
-            }
-        } while (!isInt && !input.equalsIgnoreCase("quit"));
+            do {
+
+                input = IOUtils.promptForString("Enter a choice: ");
+                movePieceCheck = Pattern.matches("[A-Ha-h][1-8][\\s][A-Ha-h][1-8]", input);
+
+                if (movePieceCheck) {
+                    String[] text = input.split(Pattern.quote(" "));
+                    positionOne = text[0];
+                    positionTwo = text[1];
+
+                    input = "1";
+
+                } else if (input.equals("help")) {
+                    input = "2";
+                }
 
 
-        boolean check = input.equalsIgnoreCase("quit");
+                try {
+                    Integer.parseInt(input);
+                    isInt = true;
+                } catch (NumberFormatException e) {
+                    isInt = false;
+                }
+            } while (!isInt && !input.equalsIgnoreCase("quit"));
 
-        if (!check) {
-            MoveResult result;
-            switch (Integer.parseInt(input)) {
-                case 1:
-                    while ((result = PromptMove()) == MoveResult.FAILED) {
 
-                        if (status != null) {
-                            System.out.println(status);
-                            setStatus(null);
-                        } else
-                            System.out.println("Invalid move try again");
+            boolean check = input.equalsIgnoreCase("quit");
 
-                    }
+            if (!check) {
 
-                    if (result == MoveResult.QUIT)
+                switch (Integer.parseInt(input)) {
+                    case 1:
+                        result = PromptMove();
+                        if (result == MoveResult.FAILED) {
+                            if (status != null) {
+                                System.out.println(status);
+                                setStatus(null);
+                            } else
+                                System.out.println("Invalid move try again");
+                        }
+                        else {
+                            counter++;
+                        }
+
+
+                        break;
+                    case 2:
+                        helpMenu();
+                        break;
+                    case 3:
                         return false;
-                    counter++;
-                    break;
-                case 2:
-                    helpMenu();
-                    break;
-                case 3:
-                    return false;
+                }
+                return true;
             }
-            return true;
-        }
-
+        } while (result == MoveResult.FAILED);
         return false;
     }
 
