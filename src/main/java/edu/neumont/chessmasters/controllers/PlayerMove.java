@@ -105,7 +105,7 @@ public class PlayerMove {
 
                 switch (Integer.parseInt(input)) {
                     case 1:
-                        result = PromptMove();
+                        result = (positionOne == null || positionTwo == null) ? MoveResult.FAILED : PromptMove();
                         if (result == MoveResult.FAILED) {
                             if (status != null) {
                                 System.out.println(status);
