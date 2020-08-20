@@ -3,7 +3,6 @@ package edu.neumont.chessmasters;
 import edu.neumont.chessmasters.controllers.PlayerMove;
 import edu.neumont.chessmasters.events.EventListener;
 import edu.neumont.chessmasters.events.EventRegistry;
-import me.travja.utils.utils.FileUtils;
 import me.travja.utils.utils.IOUtils;
 import org.fusesource.jansi.AnsiConsole;
 
@@ -37,8 +36,10 @@ public class ChessMasters {
         } else {
             try {
                 CodeSource codeSource = ChessMasters.class.getProtectionDomain().getCodeSource();
-                String jarDir = new File(codeSource.getLocation().toURI().getPath()).getParentFile().getPath();
-                Runtime.getRuntime().exec(new String[]{"cmd.exe", "/c start cmd.exe /k \"java -jar \"" + jarDir + "\\ChessMasters.jar\" -start\""});
+                String path = codeSource.getLocation().toURI().getPath();
+                String jarDir = new File(path).getParentFile().getPath();
+                String fileName = new File(path).getName();
+                Runtime.getRuntime().exec(new String[]{"cmd.exe", "/c start cmd.exe /k \"java -jar \"" + jarDir + File.separator + fileName + "\" -start\""});
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }
