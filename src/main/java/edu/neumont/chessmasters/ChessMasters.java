@@ -36,6 +36,15 @@ public class ChessMasters {
 			}
 		}
 
+		public static final String help = 
+			"Options:\n"+
+				"\t-h  --help              \tDisplay this help and exit\n" +
+				"\t-c  --color   <tristate>\tConfigure color support\n" +
+				"\t-u  --unicode <tristate>\tonfigure unicode support\n" +
+				"\t-d  --debug             \tEnable debug mode\n" +
+				"\n" +
+				"\t<tristate>\tOne of { yes | no | on | off | 1 | 0 | true | false | enable | disable | auto }\n";
+
     public static void main(String[] args) {
 			options = new GameSettings(args);
 			options.needsWrapping = System.getProperty("os.name").toLowerCase().contains("windows");
@@ -47,10 +56,14 @@ public class ChessMasters {
 			// we wish to, e.g. in case of an option of the form "--option parameter"
 			while (argv.size() > 0) {
 				String option = argv.remove(0);
-				System.out.println("Processing option: " + option);
 
 				if (option != null)
 				switch (option) {
+
+					case "-h":
+					case "--help":
+						System.out.println(help);
+						System.exit(0);
 
 					case "--start":
 						options.start = true;
