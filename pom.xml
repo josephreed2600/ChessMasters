@@ -51,6 +51,7 @@
                             <artifactSet>
                                 <includes>
                                     <include>com.github.Travja:TravjaUtils</include>
+                                    <include>org.fusesource.jansi:jansi</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
@@ -100,6 +101,11 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.4.2</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+            <version>1.18</version>
         </dependency>
     </dependencies>
 
