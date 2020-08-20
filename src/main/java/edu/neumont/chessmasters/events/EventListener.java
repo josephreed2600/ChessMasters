@@ -50,7 +50,6 @@ public class EventListener {
     public void move(PostPieceMoveEvent event) {
         if (event.getBoard().isGhostBoard)
             return;
-        System.out.println("running post move for " + event.getPiece());
         boolean check = PlayerMove.inst().getBoard().isInCheck(event.getPiece().getColor().getOpposite());//PlayerMove.inst().getBoard().pieceCreatesCheck(event.getPiece());
         String status = ChessMasters.controller.getStatus() == null ? "" : ChessMasters.controller.getStatus();
         if (check) {
