@@ -50,11 +50,11 @@ public class PlayerMove {
 
     //Returns a boolean dependent on if the player intends to quit the game or not.
     public boolean MenuPrompt() throws EOFException {
-        System.out.println("\n" + board);
+        board.clearPassant(counter % 2 == 0 ? PieceColor.WHITE : PieceColor.BLACK);
+        System.out.println("\n\n" + board);
         boolean movePieceCheck;
         MoveResult result = null;
         do {
-
 
             if (status != null) {
                 System.out.println(status);
@@ -109,10 +109,7 @@ public class PlayerMove {
                     case 1:
                         result = (positionOne == null || positionTwo == null) ? MoveResult.FAILED : PromptMove();
                         if (result == MoveResult.FAILED) {
-//                            if (status != null) {
-//                                System.out.println(status);
-//                                setStatus(null);
-//                            } else
+                            if (status == null)
                                 setStatus("That move could not be performed.");
                         } else {
                             counter++;
@@ -223,7 +220,9 @@ public class PlayerMove {
     private void helpMenu() throws EOFException {
         StringBuilder helper = new StringBuilder("Helper commands");
 
-        helper.append("\n\nWhen inputting a position only give two characters:\n Ex) A2 A4").append("\nTo quit/forfeit the game simply type quit whenever\n");
+        helper.append("\n\nWhen inputting a position only give two characters:\n Ex) A2 A4").append("\nTo quit/forfeit the game simply type quit whenever\n" +
+                "\nEn Passant: When a '*' is displayed, an en passant is possible. This occurs when a pawn takes its initial move two spaces,\n" +
+                "but could be intercepted by an opposing piece. If the opportunity is not taken, it is lost.\n");
         //System.out.println(
         setStatus(helper.toString());
     }

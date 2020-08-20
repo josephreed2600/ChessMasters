@@ -149,6 +149,10 @@ public class Board {
 		this.squares = new Piece[8][8];
 	}
 
+	public void clearPassant(PieceColor color) {
+		getAllPieces(color).stream().filter(piece -> piece instanceof PassantTarget).forEach(piece -> setSquare(piece.getLocation(), null));
+	}
+
 	public boolean placePiece(Piece p, Location l) {
 		if (getSquare(l) != null) return false;
 		setSquare(l, p);
@@ -187,15 +191,6 @@ public class Board {
 					("An attempt (" + p.getLocation() + " -> " + dest + ") was made to capture a king, indicating that the game was in an illegal state:\n" + this.toString());
 		}
 
-		if (victim != null &&
-				( (p instanceof Pawn && p.getLocation().getX() != dest.getX())
-						|| !(p instanceof Pawn) ) ) {
-			if (!this.isGhostBoard) {
-				PieceCaptureEvent event = new PieceCaptureEvent(p, victim); //Fire our capture event when a piece is captured.
-				EventRegistry.callEvents(event);
-			}
-		}
-
 		if (p instanceof Pawn) {
 			// in a valid move, either we're capturing or we're going straight forward
 			return (victim != null) ^ (p.getLocation().getX() == dest.getX());
@@ -214,6 +209,7 @@ public class Board {
 	public boolean isInCheckmate(PieceColor color) {
 		return isInCheckmate(getKing(color));
 	}
+
 	public boolean isInCheckmate(King king) {
 		if (!isInCheck(king)) return false;
 		for (int rank_from = 0; rank_from < 8; rank_from++) {
@@ -232,9 +228,9 @@ public class Board {
 
 						Board b = new Board(this, true);
 						try {
-						if (b.movePiece(from, to) && !b.isInCheck(king.getColor()))
-							// we found a move that's valid and removes us from check
-							return false; // so we're not in checkmate
+							if (b.movePiece(from, to) && !b.isInCheck(king.getColor()))
+								// we found a move that's valid and removes us from check
+								return false; // so we're not in checkmate
 						} catch (UnsupportedOperationException uoe) {
 							continue;
 						}
@@ -258,6 +254,23 @@ public class Board {
 		if (p == null) return false;
 		if (!validateMove(p, to)) return false;
 		if (!p.move(to, this.isGhostBoard)) return false;
+		if (p instanceof Pawn) checkPassant((Pawn) p, from);
+
+		Piece victim = getSquare(to);
+		if (victim != null) {
+			boolean passant = p instanceof Pawn && victim instanceof PassantTarget;
+			if (!this.isGhostBoard) {
+				PieceCaptureEvent event = new PieceCaptureEvent(p, victim, this); //Fire our capture event when a piece is captured.
+				event.setPassant(passant);
+				EventRegistry.callEvents(event);
+			}
+			if (p instanceof Pawn && from.getX() != p.getLocation().getX()) {//The location has been updated to the 'to' location
+				if (victim instanceof PassantTarget) {
+					setSquare(((PassantTarget) victim).getOwner().getLocation(), null);
+				}
+			}
+		}
+
 		setSquare(to, p);
 		setSquare(from, null);
 
@@ -271,6 +284,47 @@ public class Board {
 			EventRegistry.callEvents(post);
 		}
 		return true;
+	}
+
+	/**
+	 * Simply toggles a flag in the pawn if this is a move that causes the piece to be passantable.
+	 *
+	 * @param pawn The pawn to check
+	 * @param dest The destination location
+	 * @return Whether or not the pawn is now passantable.
+	 */
+	public boolean checkPassant(Pawn pawn, Location dest) {
+		Location location = pawn.getLocation();
+		int numMoves = pawn.getNumMoves();
+		System.out.println("Checking passant for pawn at " + location);
+		System.out.println("Moves: " + numMoves);
+		System.out.println("Diff: " + Math.abs(location.getY() - dest.getY()));
+		if (numMoves == 1 && Math.abs(location.getY() - dest.getY()) == 2) { //This is our first move (already executed) and we're moving 2 spaces
+			int dy = location.getY() - dest.getY();
+			boolean passantTarget = false;
+
+			Location intercept = new Location(location.getX(), dest.getY() + (dy / 2));
+			System.out.println("Intercept at: " + intercept);
+			for (Piece piece : getAllPieces(pawn.getColor().getOpposite())) {
+				if (!(piece instanceof Pawn))
+					continue;
+
+				if (piece.validateCapture(intercept)) {
+					System.out.println("A piece can capture the pawn there.");
+					passantTarget = true;
+				}
+			}
+			pawn.setPassantable(passantTarget);
+
+			if (passantTarget) {
+				this.setSquare(intercept, new PassantTarget(pawn));
+				ChessMasters.controller.setStatus("Note: The '*' indicates that an en passant is possible. For more details, type 'help'");
+			}
+		} else if (pawn.isPassantable()) {
+			pawn.setPassantable(false);
+		}
+
+		return pawn.isPassantable();
 	}
 
 	public boolean isInCheck(PieceColor color) {

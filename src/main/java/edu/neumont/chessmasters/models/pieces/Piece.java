@@ -123,7 +123,9 @@ public abstract class Piece {
         if (this.getLocation() != null && !validateMove(location))
             return false;
 
-        this.location = new Location(location);
+        Location dest = new Location(location);
+        this.location = dest;
+
         numMoves++;
         return true;
     }
@@ -137,7 +139,11 @@ public abstract class Piece {
     }
 
     public Piece clone() {
-        Piece piece = Piece.fromFEN(getNotation());
+        Piece piece;
+        if (this instanceof PassantTarget)
+            piece = new PassantTarget(((PassantTarget) this).getOwner());
+        else
+            piece = Piece.fromFEN(getNotation());
 
         piece.setLocation(this.getLocation());
         piece.setNumMoves(this.getNumMoves());
@@ -154,6 +160,7 @@ public abstract class Piece {
     /**
      * Validates that a capture is legal.
      * This is really most applicable to Pawns as they can't capture where they indeed might be able to move.
+     *
      * @param location
      * @return
      */

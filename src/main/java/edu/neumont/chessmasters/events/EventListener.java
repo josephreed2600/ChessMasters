@@ -5,6 +5,7 @@ import edu.neumont.chessmasters.annotations.EventHandler;
 import edu.neumont.chessmasters.controllers.PlayerMove;
 import edu.neumont.chessmasters.models.Board;
 import edu.neumont.chessmasters.models.pieces.King;
+import edu.neumont.chessmasters.models.pieces.PassantTarget;
 import edu.neumont.chessmasters.models.pieces.Piece;
 import edu.neumont.chessmasters.models.pieces.PieceColor;
 
@@ -53,9 +54,16 @@ public class EventListener {
     public void capture(PieceCaptureEvent event) {
         Piece target = event.getCaptured();
         Piece attacker = event.getAttacker();
+        String extra = "";
 //        System.out.println(
-        ChessMasters.controller.setStatus("The " + target.getColor().toString().toLowerCase() + " " + target.getName().toLowerCase() +
-                " was captured by the " + attacker.getColor().toString().toLowerCase() + " " + attacker.getName().toLowerCase());
+        if (event.isPassant()) {
+            target = ((PassantTarget) target).getOwner();
+            extra = " by performing an En Passant!";
+        }
+
+        if (!(target instanceof PassantTarget))
+            ChessMasters.controller.setStatus("The " + target.getColor().toString().toLowerCase() + " " + target.getName().toLowerCase() +
+                    " was captured by the " + attacker.getColor().toString().toLowerCase() + " " + attacker.getName().toLowerCase() + extra);
     }
 
 }
