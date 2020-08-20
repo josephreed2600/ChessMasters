@@ -4,6 +4,8 @@ import edu.neumont.chessmasters.models.Location;
 
 public class Pawn extends Piece {
 
+    protected boolean isPassantable = false;
+
     public Pawn(PieceColor color) {
         super(color, "p");
     }
@@ -11,6 +13,14 @@ public class Pawn extends Piece {
     public boolean shouldPromote() {
         return (color == PieceColor.WHITE && getLocation().getY() == 7) ||
                 (color == PieceColor.BLACK && getLocation().getY() == 0);
+    }
+
+    public boolean isPassantable() {
+        return isPassantable;
+    }
+
+    public void setPassantable(boolean passantable) {
+        isPassantable = passantable;
     }
 
     @Override

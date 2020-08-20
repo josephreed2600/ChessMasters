@@ -7,6 +7,7 @@ import edu.neumont.chessmasters.models.Board;
 import edu.neumont.chessmasters.models.GameSettings;
 import me.travja.utils.utils.IOUtils;
 import me.travja.utils.utils.FileUtils;
+import org.fusesource.jansi.AnsiConsole;
 
 import java.io.EOFException;
 import java.io.File;
@@ -113,7 +114,8 @@ public class ChessMasters {
 
     public static void startGame() {
         boolean playAgain;
-        if(System.console() == null) {
+        checkColorSupport();
+        if (System.console() == null) {
             System.out.println(" ----[ IMPORTANT ]----\n" +
                     "This game session is not directly attached to a Console object. (Either stdin or stdout is being redirected.)\n" +
                     "If you enter a null string for any prompt, the application WILL terminate.\n" +
@@ -123,8 +125,8 @@ public class ChessMasters {
         try {
             do {
                 //Run setup here.
-                Board board = new Board();
-                controller = new PlayerMove(board);
+//                Board board = new Board("r2qk2r/8/8/8/8/8/8/R2QK2R w KQkq - 0 1");
+                controller = new PlayerMove();
                 controller.run();
                 playAgain = IOUtils.promptForBoolean("Play again? (y/n)", "y", "n");
             } while (playAgain);
@@ -132,6 +134,13 @@ public class ChessMasters {
             System.err.println("Input stream was terminated. Exiting program.");
         }
         System.out.println("Goodbye");
+    }
+
+    public static void checkColorSupport() {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            AnsiConsole.systemInstall();
+            Utils.USE_ANSI = true;
+        }
     }
 
     private static void registerEvents() {

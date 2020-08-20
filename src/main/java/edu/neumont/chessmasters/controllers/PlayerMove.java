@@ -18,6 +18,10 @@ public class PlayerMove {
     public         String     positionOne;
     public         String     positionTwo;
 
+    public PlayerMove() {
+        this(new Board());
+    }
+
     public PlayerMove(Board board) {
         inst = this;
         this.board = board;
@@ -47,15 +51,17 @@ public class PlayerMove {
         this.status = status;
     }
 
+    public String getStatus() {
+        return status;
+    }
 
     //Returns a boolean dependent on if the player intends to quit the game or not.
     public boolean MenuPrompt() throws EOFException {
-        System.out.println("\n" + board);
+        board.clearPassant(counter % 2 == 0 ? PieceColor.WHITE : PieceColor.BLACK);
+        System.out.println("\n\n" + board);
         boolean movePieceCheck;
         MoveResult result = null;
         do {
-
-
             if (status != null) {
                 System.out.println(status);
                 setStatus(null);
@@ -69,7 +75,7 @@ public class PlayerMove {
             sb.append("\n\n").append(counter % 2 == 0 ? "White" : "Black").append(", it's your turn:");
 
             System.out.println(sb);
-            String input;
+            String input = null;
             boolean isInt;
 
 
@@ -77,6 +83,8 @@ public class PlayerMove {
 
                 positionOne = null;
                 positionTwo = null;
+                if(input != null)
+                    System.out.println("Unrecognized command. Type 'help' for help.");
                 input = IOUtils.promptForString("Enter a choice: ");
                 movePieceCheck = Pattern.matches("[A-Ha-h][1-8][\\s][A-Ha-h][1-8]", input);
 
@@ -109,10 +117,7 @@ public class PlayerMove {
                     case 1:
                         result = (positionOne == null || positionTwo == null) ? MoveResult.FAILED : PromptMove();
                         if (result == MoveResult.FAILED) {
-//                            if (status != null) {
-//                                System.out.println(status);
-//                                setStatus(null);
-//                            } else
+                            if (status == null)
                                 setStatus("That move could not be performed.");
                         } else {
                             counter++;
@@ -221,9 +226,12 @@ public class PlayerMove {
     }
 
     private void helpMenu() throws EOFException {
-        StringBuilder helper = new StringBuilder("Helper commands");
+        StringBuilder helper = new StringBuilder(" --[ Helper commands ]-- ");
 
-        helper.append("\n\nWhen inputting a position only give two characters:\n Ex) A2 A4").append("\nTo quit/forfeit the game simply type quit whenever\n");
+        helper.append("\n\nTo move, simply input your target piece (a2) and your destination (a4). Ex: 'a2 a4' moves the piece at a2 to a4")
+                .append("\n\nTo quit/forfeit the game simply type 'quit' whenever\n")
+                .append("\nEn Passant: When a '*' is displayed, an en passant is possible. This occurs when a pawn takes its initial move two spaces,\n")
+                .append("but could be intercepted by an opposing piece. If the opportunity is not taken, it is lost.\n");
         //System.out.println(
         setStatus(helper.toString());
     }

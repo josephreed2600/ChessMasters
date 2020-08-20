@@ -149,6 +149,10 @@ public class Board {
 		this.squares = new Piece[8][8];
 	}
 
+	public void clearPassant(PieceColor color) {
+		getAllPieces(color).stream().filter(piece -> piece instanceof PassantTarget).forEach(piece -> setSquare(piece.getLocation(), null));
+	}
+
 	public boolean placePiece(Piece p, Location l) {
 		if (getSquare(l) != null) return false;
 		setSquare(l, p);
@@ -179,21 +183,12 @@ public class Board {
 			}
 			// if we are, ensure that we're capturing an opponent
 			if (victim.getColor() == p.getColor())
-				return (p instanceof King && victim instanceof Rook);
+				return (p instanceof King && victim instanceof Rook && p.getNumMoves() == 0 && victim.getNumMoves() == 0);
 			// if we're trying to capture a king, something has gone horribly wrong---we
 			// shouldn't have been able to reach this configuration in the first place
 			if (victim instanceof King)
 				throw new UnsupportedOperationException
 					("An attempt (" + p.getLocation() + " -> " + dest + ") was made to capture a king, indicating that the game was in an illegal state:\n" + this.toString());
-		}
-
-		if (victim != null &&
-				( (p instanceof Pawn && p.getLocation().getX() != dest.getX())
-						|| !(p instanceof Pawn) ) ) {
-			if (!this.isGhostBoard) {
-				PieceCaptureEvent event = new PieceCaptureEvent(p, victim); //Fire our capture event when a piece is captured.
-				EventRegistry.callEvents(event);
-			}
 		}
 
 		if (p instanceof Pawn) {
@@ -214,6 +209,7 @@ public class Board {
 	public boolean isInCheckmate(PieceColor color) {
 		return isInCheckmate(getKing(color));
 	}
+
 	public boolean isInCheckmate(King king) {
 		if (!isInCheck(king)) return false;
 		for (int rank_from = 0; rank_from < 8; rank_from++) {
@@ -232,9 +228,9 @@ public class Board {
 
 						Board b = new Board(this, true);
 						try {
-						if (b.movePiece(from, to) && !b.isInCheck(king.getColor()))
-							// we found a move that's valid and removes us from check
-							return false; // so we're not in checkmate
+							if (b.movePiece(from, to) && !b.isInCheck(king.getColor()))
+								// we found a move that's valid and removes us from check
+								return false; // so we're not in checkmate
 						} catch (UnsupportedOperationException uoe) {
 							continue;
 						}
@@ -255,22 +251,135 @@ public class Board {
 
 	public boolean movePiece(Location from, Location to) {
 		Piece p = getSquare(from);
+		Piece target = getSquare(to);
 		if (p == null) return false;
 		if (!validateMove(p, to)) return false;
-		if (!p.move(to, this.isGhostBoard)) return false;
-		setSquare(to, p);
-		setSquare(from, null);
+		if (isCastle(new Move(from, to))) {
+			boolean castled = castle((King) p, (Rook) target);
 
-		if (p instanceof Pawn && ((Pawn) p).shouldPromote()) { //Promote pawn to queen.
-			p = new Queen(p.getColor());
+			if (castled) {
+				ChessMasters.controller.setStatus(p.getColor().name() + " performed a " + (target.getLocation().getX() < p.getLocation().getX() ? "king-side" : "queen-side") + " castle.");
+			}
+
+			if (!this.isGhostBoard) {
+				PostPieceMoveEvent post = new PostPieceMoveEvent(p, target, this);
+				EventRegistry.callEvents(post);
+			}
+
+			return castled;
+//			ChessMasters.controller.setStatus("Castling has not been fully implemented! Hold tight!");
+//			return false;
+		} else {
+			Piece victim = getSquare(to);
+			PieceCaptureEvent capture = new PieceCaptureEvent(p, victim, this); //Fire our capture event when a piece is captured.
+			if (!p.move(to, this.isGhostBoard)) return false;
+			if (p instanceof Pawn) checkPassant((Pawn) p, from);
 			setSquare(to, p);
-		}
+			setSquare(from, null);
 
-		if (!this.isGhostBoard) {
-			PostPieceMoveEvent post = new PostPieceMoveEvent(p);
-			EventRegistry.callEvents(post);
+			if (victim != null) {
+				boolean passant = p instanceof Pawn && victim instanceof PassantTarget;
+				if (p instanceof Pawn && from.getX() != p.getLocation().getX()) {//The location has been updated to the 'to' location
+					if (victim instanceof PassantTarget) {
+						setSquare(((PassantTarget) victim).getOwner().getLocation(), null);
+					}
+				}
+				if (!this.isGhostBoard) {
+					capture.setPassant(passant);
+					EventRegistry.callEvents(capture);
+				}
+			}
+
+			setSquare(to, p);
+			setSquare(from, null);
+
+			if (p instanceof Pawn && ((Pawn) p).shouldPromote()) { //Promote pawn to queen.
+				p = new Queen(p.getColor());
+				setSquare(to, p);
+			}
+
+			if (!this.isGhostBoard) {
+				PostPieceMoveEvent post = new PostPieceMoveEvent(p, this);
+				EventRegistry.callEvents(post);
+			}
 		}
 		return true;
+	}
+
+	private boolean isCastle(Move move) {
+		Piece piece = getSquare(move.from);
+		Piece target = getSquare(move.to);
+		if (piece == null || target == null)
+			return false;
+
+		if (piece instanceof King) {
+			if (target != null && target instanceof Rook
+					&& target.getColor() == piece.getColor()) {
+				return piece.getNumMoves() == 0 && target.getNumMoves() == 0;
+			}
+		}
+		return false;
+	}
+
+	public boolean castle(King king, Rook rook) {
+		int dx = rook.getLocation().getX() - king.getLocation().getX();
+		if (dx < 0)
+			dx += 2;
+		else
+			dx -= 1;
+
+		Location kingInit = king.getLocation();
+		Location rookInit = rook.getLocation();
+
+		Location kingDest = new Location(king.getLocation().getX() + dx, king.getLocation().getY());
+		Location rookDest = new Location(kingDest.getX() + (dx < 0 ? 1 : -1), kingDest.getY());
+
+		if (!king.move(kingDest) || !rook.move(rookDest)) {
+			king.setLocation(kingInit);
+			rook.setLocation(rookInit);
+			return false;
+		}
+		setSquare(kingDest, king);
+		setSquare(rookDest, rook);
+		setSquare(kingInit, null);
+		setSquare(rookInit, null);
+		return true;
+	}
+
+	/**
+	 * Simply toggles a flag in the pawn if this is a move that causes the piece to be passantable.
+	 *
+	 * @param pawn The pawn to check
+	 * @param dest The destination location
+	 * @return Whether or not the pawn is now passantable.
+	 */
+	public boolean checkPassant(Pawn pawn, Location dest) {
+		Location location = pawn.getLocation();
+		int numMoves = pawn.getNumMoves();
+		if (numMoves == 1 && Math.abs(location.getY() - dest.getY()) == 2) { //This is our first move (already executed) and we're moving 2 spaces
+			int dy = location.getY() - dest.getY();
+			boolean passantTarget = false;
+
+			Location intercept = new Location(location.getX(), dest.getY() + (dy / 2));
+			for (Piece piece : getAllPieces(pawn.getColor().getOpposite())) {
+				if (!(piece instanceof Pawn))
+					continue;
+
+				if (piece.validateCapture(intercept)) {
+					passantTarget = true;
+				}
+			}
+			pawn.setPassantable(passantTarget);
+
+			if (passantTarget) {
+				this.setSquare(intercept, new PassantTarget(pawn));
+				ChessMasters.controller.setStatus("Note: The '*' indicates that an en passant is possible. For more details, type 'help'");
+			}
+		} else if (pawn.isPassantable()) {
+			pawn.setPassantable(false);
+		}
+
+		return pawn.isPassantable();
 	}
 
 	public boolean isInCheck(PieceColor color) {

@@ -2,7 +2,7 @@ package edu.neumont.chessmasters;
 
 public class Utils {
 	public static final boolean USE_UNICODE = false;
-	public static final boolean USE_ANSI = !System.getProperty("os.name").startsWith("Windows");
+	public static boolean USE_ANSI = !System.getProperty("os.name").startsWith("Windows");
 
 	public static class Drawing {
 		public static class Corners {
