@@ -21,7 +21,6 @@ import java.util.Collections;
 
 public class ChessMasters {
 
-	public static GameSettings options;
     public static PlayerMove controller;
 
 		public static void executeWrappedJar(String[] args) {
@@ -45,10 +44,11 @@ public class ChessMasters {
 				"\n" +
 				"\t<tristate>\tOne of { yes | no | on | off | 1 | 0 | true | false | enable | disable | auto }\n";
 
-    public static void main(String[] args) {
-			options = new GameSettings(args);
+		public static GameSettings parseArgs(String[] args) {
+			GameSettings options = new GameSettings(args);
 			options.needsWrapping = System.getProperty("os.name").toLowerCase().contains("windows");
 
+			// convert array into a more friendly format
 			List<String> argv = new ArrayList<String>();
 			Collections.addAll(argv, args);
 
@@ -145,6 +145,11 @@ public class ChessMasters {
 						break;
 				}
 			}
+			return options;
+		}
+
+    public static void main(String[] args) {
+			GameSettings options = parseArgs(args);
 
         if (options.needsWrapping) {
 					executeWrappedJar(args);
@@ -164,7 +169,7 @@ public class ChessMasters {
                     "Chances are, you know what you're doing, but if you accessed the application in a normal way, please let the developers know that you're receiving this error.\n");
         }
 
-				if(options.color != null) Utils.USE_ANSI = options.color;
+				if(options.color   != null) Utils.USE_ANSI    = options.color;
 				if(options.unicode != null) Utils.USE_UNICODE = options.unicode;
 
         try {
