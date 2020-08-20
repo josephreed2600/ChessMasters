@@ -1,7 +1,7 @@
 package edu.neumont.chessmasters.models.pieces;
 
+import edu.neumont.chessmasters.ChessMasters;
 import edu.neumont.chessmasters.controllers.PlayerMove;
-import edu.neumont.chessmasters.models.Board;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +12,8 @@ class PieceMovementTests {
 
     @BeforeAll
     public static void setup() {
-        PlayerMove controller = new PlayerMove(new Board());
+        PlayerMove controller = new PlayerMove();
+        ChessMasters.controller = controller;
     }
 
     private boolean test(Piece piece, String position) {
