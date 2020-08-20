@@ -418,28 +418,28 @@ public class Board {
 
 		// Build the top edge
 		String top = Utils.buildRow(
-				"   " + Utils.Drawing.Corners.topLeft,
-				Utils.Drawing.Edges.horizontal + Utils.Drawing.Edges.horizontal + Utils.Drawing.Edges.horizontal,
-				Utils.Drawing.Joints.horizontalDown,
-				Utils.Drawing.Corners.topRight,
+				"   " + Utils.Drawing.Corners.topLeft(),
+				Utils.Drawing.Edges.horizontal() + Utils.Drawing.Edges.horizontal() + Utils.Drawing.Edges.horizontal(),
+				Utils.Drawing.Joints.horizontalDown(),
+				Utils.Drawing.Corners.topRight(),
 				8
 				) + "\n";
 
 		// Build the row separator
 		String rowSep = Utils.buildRow(
-				"   " + Utils.Drawing.Joints.verticalRight,
-				Utils.Drawing.Edges.horizontal + Utils.Drawing.Edges.horizontal + Utils.Drawing.Edges.horizontal,
-				Utils.Drawing.Joints.cross,
-				Utils.Drawing.Joints.verticalLeft,
+				"   " + Utils.Drawing.Joints.verticalRight(),
+				Utils.Drawing.Edges.horizontal() + Utils.Drawing.Edges.horizontal() + Utils.Drawing.Edges.horizontal(),
+				Utils.Drawing.Joints.cross(),
+				Utils.Drawing.Joints.verticalLeft(),
 				8
 				) + "\n";
 
 		// Build the bottom edge
 		String bottom = Utils.buildRow(
-				"   " + Utils.Drawing.Corners.bottomLeft,
-				Utils.Drawing.Edges.horizontal + Utils.Drawing.Edges.horizontal + Utils.Drawing.Edges.horizontal,
-				Utils.Drawing.Joints.horizontalUp,
-				Utils.Drawing.Corners.bottomRight,
+				"   " + Utils.Drawing.Corners.bottomLeft(),
+				Utils.Drawing.Edges.horizontal() + Utils.Drawing.Edges.horizontal() + Utils.Drawing.Edges.horizontal(),
+				Utils.Drawing.Joints.horizontalUp(),
+				Utils.Drawing.Corners.bottomRight(),
 				8
 				) + "\n";
 
@@ -459,19 +459,19 @@ public class Board {
 			sb_out.append(' ').append(rankIndex--).append(' ');
 			for (Piece piece : rank) {
 				sb_out
-					.append(Utils.Drawing.Edges.vertical)
-					.append(squareColor ? Utils.Styles.lightSquare : Utils.Styles.darkSquare)
+					.append(Utils.Drawing.Edges.vertical())
+					.append(squareColor ? Utils.Styles.lightSquare() : Utils.Styles.darkSquare())
 					.append(' ')
 					.append(piece == null ? '-' : piece)
 					.append(' ')
-					.append(Utils.Styles.reset)
+					.append(Utils.Styles.reset())
 					;
 				squareColor = !squareColor;
 			}
 			squareColor = !squareColor;
 
 			sb_out
-				.append(Utils.Drawing.Edges.vertical)
+				.append(Utils.Drawing.Edges.vertical())
 				.append('\n')
 				;
 

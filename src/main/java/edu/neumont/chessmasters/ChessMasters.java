@@ -24,13 +24,13 @@ public class ChessMasters {
 	public static GameSettings options;
     public static PlayerMove controller;
 
-		public static void executeWrappedJar() {
+		public static void executeWrappedJar(String[] args) {
 			//This just allows the jar to be double-clicked in windows.
 			try {
 				CodeSource codeSource = ChessMasters.class.getProtectionDomain().getCodeSource();
 				String jarDir = new File(codeSource.getLocation().toURI().getPath()).getParentFile().getPath();
 				Runtime.getRuntime().exec(new String[]{
-					"cmd.exe", "/c start cmd.exe /k \"java -jar \"" + jarDir + "\\ChessMasters.jar\" --start\""});
+					"cmd.exe", "/c start cmd.exe /k \"java -jar \"" + jarDir + "\\ChessMasters.jar\" --start " + String.join(" ", args) + "\""});
 			} catch (IOException | URISyntaxException e) {
 				e.printStackTrace();
 			}
@@ -65,9 +65,11 @@ public class ChessMasters {
 
 					case "-c":
 					case "--color":
-						if (argv.size() < 1)
+						if (argv.size() < 1) {
 							System.err.println(
 									"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
+							break;
+						}
 						String colorSetting = argv.remove(0);
 						switch (colorSetting) {
 							case "true":  case "yes": case "on":  case "1": case "enable":
@@ -86,11 +88,38 @@ public class ChessMasters {
 						}
 						break;
 
+					case "-u":
+					case "--unicode":
+						if (argv.size() < 1) {
+							System.err.println(
+									"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
+							break;
+						}
+						String unicodeSetting = argv.remove(0);
+						switch (unicodeSetting) {
+							case "true":  case "yes": case "on":  case "1": case "enable":
+								options.unicode = true;
+								break;
+							case "false": case "no":  case "off": case "0": case "disable":
+								options.unicode = false;
+								break;
+							case "auto":
+								options.unicode = null;
+								break;
+							default:
+								System.err.println(
+										"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + unicodeSetting
+										+ ". Ignoring");
+						}
+						break;
+
 					case "--file":
 					case "-f":
 						// handle files here
-						if (argv.size() < 1)
+						if (argv.size() < 1) {
 							System.err.println("[ warn ]\tOption " + option + " expects a file path; received nothing. Ignoring");
+							break;
+						}
 						options.filePath = argv.remove(0);
 						options.fileContents = FileUtils.readFileFully(options.filePath);
 						System.out.println("Found file contents:\n" + options.fileContents);
@@ -105,14 +134,14 @@ public class ChessMasters {
 			}
 
         if (options.needsWrapping) {
-					executeWrappedJar();
+					executeWrappedJar(args);
         } else {
             registerEvents();
-            startGame();
+            startGame(options);
         }
     }
 
-    public static void startGame() {
+    public static void startGame(GameSettings options) {
         boolean playAgain;
         checkColorSupport();
         if (System.console() == null) {
@@ -121,6 +150,9 @@ public class ChessMasters {
                     "If you enter a null string for any prompt, the application WILL terminate.\n" +
                     "Chances are, you know what you're doing, but if you accessed the application in a normal way, please let the developers know that you're receiving this error.\n");
         }
+
+				if(options.color != null) Utils.USE_ANSI = options.color;
+				if(options.unicode != null) Utils.USE_UNICODE = options.unicode;
 
         try {
             do {

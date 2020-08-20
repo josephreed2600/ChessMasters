@@ -186,8 +186,8 @@ public abstract class Piece {
     @Override
     public String toString() {
         return getColor() == PieceColor.WHITE
-                ? Utils.Styles.lightPiece + this.notation.toUpperCase() + Utils.Styles.afterPiece
-                : Utils.Styles.darkPiece + this.notation.toLowerCase() + Utils.Styles.afterPiece
+                ? Utils.Styles.lightPiece() + this.notation.toUpperCase() + Utils.Styles.afterPiece()
+                : Utils.Styles.darkPiece() + this.notation.toLowerCase() + Utils.Styles.afterPiece()
                 ;
     }
 
