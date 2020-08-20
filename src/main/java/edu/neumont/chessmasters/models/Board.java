@@ -179,7 +179,7 @@ public class Board {
 			}
 			// if we are, ensure that we're capturing an opponent
 			if (victim.getColor() == p.getColor())
-				return (p instanceof King && victim instanceof Rook);
+				return (p instanceof King && victim instanceof Rook && p.getNumMoves() == 0 && victim.getNumMoves() == 0);
 			// if we're trying to capture a king, something has gone horribly wrong---we
 			// shouldn't have been able to reach this configuration in the first place
 			if (victim instanceof King)
@@ -255,21 +255,75 @@ public class Board {
 
 	public boolean movePiece(Location from, Location to) {
 		Piece p = getSquare(from);
+		Piece target = getSquare(to);
 		if (p == null) return false;
 		if (!validateMove(p, to)) return false;
-		if (!p.move(to, this.isGhostBoard)) return false;
-		setSquare(to, p);
-		setSquare(from, null);
 
-		if (p instanceof Pawn && ((Pawn) p).shouldPromote()) { //Promote pawn to queen.
-			p = new Queen(p.getColor());
+		if (isCastle(new Move(from, to))) {
+			boolean castled = castle((King) p, (Rook) target);
+
+			if(castled) {
+				ChessMasters.controller.setStatus(p.getColor().name() + " performed a " + (target.getLocation().getX() < p.getLocation().getX() ? "king-side" : "queen-side") + " castle.");
+			}
+
+			return castled;
+//			ChessMasters.controller.setStatus("Castling has not been fully implemented! Hold tight!");
+//			return false;
+		} else {
+			if (!p.move(to, this.isGhostBoard)) return false;
 			setSquare(to, p);
-		}
+			setSquare(from, null);
 
-		if (!this.isGhostBoard) {
-			PostPieceMoveEvent post = new PostPieceMoveEvent(p);
-			EventRegistry.callEvents(post);
+			if (p instanceof Pawn && ((Pawn) p).shouldPromote()) { //Promote pawn to queen.
+				p = new Queen(p.getColor());
+				setSquare(to, p);
+			}
+
+			if (!this.isGhostBoard) {
+				PostPieceMoveEvent post = new PostPieceMoveEvent(p);
+				EventRegistry.callEvents(post);
+			}
 		}
+		return true;
+	}
+
+	private boolean isCastle(Move move) {
+		Piece piece = getSquare(move.from);
+		Piece target = getSquare(move.to);
+		if(piece == null || target == null)
+			return false;
+
+		if (piece instanceof King) {
+			if (target != null && target instanceof Rook
+					&& target.getColor() == piece.getColor()) {
+				return piece.getNumMoves() == 0 && target.getNumMoves() == 0;
+			}
+		}
+		return false;
+	}
+
+	public boolean castle(King king, Rook rook) {
+		int dx = rook.getLocation().getX() - king.getLocation().getX();
+		if (dx < 0)
+			dx += 2;
+		else
+			dx -= 1;
+
+		Location kingInit = king.getLocation();
+		Location rookInit = rook.getLocation();
+
+		Location kingDest = new Location(king.getLocation().getX() + dx, king.getLocation().getY());
+		Location rookDest = new Location(kingDest.getX() + (dx < 0 ? 1 : -1), kingDest.getY());
+
+		if (!king.move(kingDest) || !rook.move(rookDest)) {
+			king.setLocation(kingInit);
+			rook.setLocation(rookInit);
+			return false;
+		}
+		setSquare(kingDest, king);
+		setSquare(rookDest, rook);
+		setSquare(kingInit, null);
+		setSquare(rookInit, null);
 		return true;
 	}
 
