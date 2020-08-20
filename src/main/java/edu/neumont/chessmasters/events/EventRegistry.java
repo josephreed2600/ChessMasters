@@ -41,14 +41,16 @@ public class EventRegistry {
         }
     }
 
-    public static void callEvents(Event event) {
-        for (Object obj : registeredClasses) {
-            for (Method method : getMethods(obj, event)) {
-                try {
-                    method.invoke(obj, event);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    System.out.println("Could not call event '" + event.getName() + "'. Please see the following error:");
-                    e.printStackTrace();
+    public static void callEvents(Event... events) {
+        for (Event event : events) {
+            for (Object obj : registeredClasses) {
+                for (Method method : getMethods(obj, event)) {
+                    try {
+                        method.invoke(obj, event);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        System.out.println("Could not call event '" + event.getName() + "'. Please see the following error:");
+                        e.printStackTrace();
+                    }
                 }
             }
         }

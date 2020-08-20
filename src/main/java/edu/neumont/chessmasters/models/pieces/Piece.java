@@ -1,5 +1,6 @@
 package edu.neumont.chessmasters.models.pieces;
 
+import edu.neumont.chessmasters.ChessMasters;
 import edu.neumont.chessmasters.Utils;
 import edu.neumont.chessmasters.controllers.PlayerMove;
 import edu.neumont.chessmasters.events.EventRegistry;
@@ -105,10 +106,17 @@ public abstract class Piece {
 
     public boolean move(String location, boolean quiet) {
         //Validate the passed in location
-        if (this.getLocation() != null && !validateMove(location))
+        if (this.getLocation() != null && !validateMove(location)) {
+            if (!quiet)
+                ChessMasters.controller.setStatus("This piece can't move in this way.");
             return false;
+        }
 
         PrePieceMoveEvent event = new PrePieceMoveEvent(this, new Location(location), !quiet ? PlayerMove.inst().getBoard() : new Board(PlayerMove.inst().getBoard()));
+        if (this instanceof King) { //Set our castle event
+            event.setCastle(numMoves == 0 && Location.getY(location) == getLocation().getY()
+                    && (Location.getX(location) == 2 || Location.getX(location) == 6));
+        }
         if (!quiet) {
             //We have to make sure to CALL our events
             EventRegistry.callEvents(event);
@@ -125,7 +133,8 @@ public abstract class Piece {
 
         Location dest = new Location(location);
         this.location = dest;
-
+        if (this instanceof King)
+            ((King) this).setCastling(false);
         numMoves++;
         return true;
     }
