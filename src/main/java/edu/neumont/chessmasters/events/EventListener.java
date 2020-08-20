@@ -4,10 +4,7 @@ import edu.neumont.chessmasters.ChessMasters;
 import edu.neumont.chessmasters.annotations.EventHandler;
 import edu.neumont.chessmasters.controllers.PlayerMove;
 import edu.neumont.chessmasters.models.Board;
-import edu.neumont.chessmasters.models.pieces.King;
-import edu.neumont.chessmasters.models.pieces.PassantTarget;
-import edu.neumont.chessmasters.models.pieces.Piece;
-import edu.neumont.chessmasters.models.pieces.PieceColor;
+import edu.neumont.chessmasters.models.pieces.*;
 
 public class EventListener {
 
@@ -22,8 +19,12 @@ public class EventListener {
             king.setLocation(event.getPassedLocation());
         }
 
+        Piece target = tempBoard.getSquare(event.getPassedLocation());
         tempBoard.setSquare(event.getFrom(), null);
         tempBoard.setSquare(event.getPassedLocation(), event.getPiece().clone());
+
+        if(target instanceof PassantTarget && event.getPiece() instanceof Pawn)
+            tempBoard.setSquare(((PassantTarget) target).getOwner().getLocation(), null);
 //        }
 
         if (tempBoard.isInCheck(king)) {

@@ -296,21 +296,16 @@ public class Board {
 	public boolean checkPassant(Pawn pawn, Location dest) {
 		Location location = pawn.getLocation();
 		int numMoves = pawn.getNumMoves();
-		System.out.println("Checking passant for pawn at " + location);
-		System.out.println("Moves: " + numMoves);
-		System.out.println("Diff: " + Math.abs(location.getY() - dest.getY()));
 		if (numMoves == 1 && Math.abs(location.getY() - dest.getY()) == 2) { //This is our first move (already executed) and we're moving 2 spaces
 			int dy = location.getY() - dest.getY();
 			boolean passantTarget = false;
 
 			Location intercept = new Location(location.getX(), dest.getY() + (dy / 2));
-			System.out.println("Intercept at: " + intercept);
 			for (Piece piece : getAllPieces(pawn.getColor().getOpposite())) {
 				if (!(piece instanceof Pawn))
 					continue;
 
 				if (piece.validateCapture(intercept)) {
-					System.out.println("A piece can capture the pawn there.");
 					passantTarget = true;
 				}
 			}

@@ -20,7 +20,6 @@ public class Pawn extends Piece {
     }
 
     public void setPassantable(boolean passantable) {
-        System.out.println(location + ": I'm passantable? " + passantable);
         isPassantable = passantable;
     }
 
