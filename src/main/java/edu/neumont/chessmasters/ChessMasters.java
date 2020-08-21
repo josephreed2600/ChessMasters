@@ -27,9 +27,12 @@ public class ChessMasters {
 			//This just allows the jar to be double-clicked in windows.
 			try {
 				CodeSource codeSource = ChessMasters.class.getProtectionDomain().getCodeSource();
-				String jarDir = new File(codeSource.getLocation().toURI().getPath()).getParentFile().getPath();
+				String path = codeSource.getLocation().toURI().getPath();
+				String jarDir = new File(path).getParentFile().getPath();
+				String fileName = new File(path).getName();
 				Runtime.getRuntime().exec(new String[]{
-					"cmd.exe", "/c start cmd.exe /k \"java -jar \"" + jarDir + "\\ChessMasters.jar\" --start " + String.join(" ", args) + "\""});
+					"cmd.exe",
+						"/c start cmd.exe /k \"java -jar \"" + jarDir + File.separator + fileName + "\" --start " + String.join(" ", args) + "\""});
 			} catch (IOException | URISyntaxException e) {
 				e.printStackTrace();
 			}
@@ -57,8 +60,8 @@ public class ChessMasters {
 			while (argv.size() > 0) {
 				String option = argv.remove(0);
 
-				if (option != null)
-				switch (option) {
+				if (option != null && option.trim().length() > 0)
+				switch (option.trim()) {
 
 					case "-h":
 					case "--help":
