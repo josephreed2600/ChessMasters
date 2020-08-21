@@ -268,6 +268,45 @@ public class Board {
 		return false;
 	}
 
+	public boolean contains(ArrayList<Piece> arr, Class<? extends Piece> type) {
+		return arr.stream().anyMatch(type::isInstance);
+	}
+
+	public boolean isDeadPosition() {
+		ArrayList<Piece> all = getAllPieces();
+		if (all.size() > 4) return false;
+
+		//Possible combinations are
+		//K v k
+		//K v k n
+		//K v k b
+		//K B v k b
+
+		if(all.size() == 2 // K v k
+				|| (contains(all, Knight.class) && all.size() == 3)) return true; // K v k n OR K N vs k
+		else if(contains(all, Bishop.class)) {
+			if(all.size() == 3) return true; // K v k b OR K B v k
+			else if(all.size() == 4) {
+				ArrayList<Piece> white = getAllPieces(PieceColor.WHITE);
+				ArrayList<Piece> black = getAllPieces(PieceColor.BLACK);
+				if(white.size() == 3 || black.size() == 3) return false;
+
+				Bishop wB = white.stream().filter(p -> p instanceof Bishop).findFirst().map(p -> (Bishop) p).orElse(null);
+				Bishop bb = black.stream().filter(p -> p instanceof Bishop).findFirst().map(p -> (Bishop) p).orElse(null);
+				if(wB == null || bb == null) return false; //In this case, we have king and something vs king and bishop. In this case, checkmate is still potentially possible.
+
+				PieceColor wBColor = wB.getLocation().getX() % 2 == 0 ? PieceColor.BLACK : PieceColor.WHITE;
+				if (wB.getLocation().getY() % 2 == 1) wBColor = wBColor.getOpposite();
+
+				PieceColor bbColor = bb.getLocation().getX() % 2 == 0 ? PieceColor.BLACK : PieceColor.WHITE;
+				if (bb.getLocation().getY() % 2 == 1) bbColor = bbColor.getOpposite();
+
+				return wBColor == bbColor;
+			}
+		}
+		return false;
+	}
+
 	public boolean movePiece(String from, String to) {
 		return movePiece(new Location(from), new Location(to));
 	}
@@ -349,6 +388,7 @@ public class Board {
 	}
 
 	public boolean castle(King king, Rook rook) {
+		if (king.getLocation().getY() != rook.getLocation().getY()) return false;
 		int dx = rook.getLocation().getX() - king.getLocation().getX();
 		if (dx < 0)
 			dx += 2;
@@ -414,6 +454,7 @@ public class Board {
 	}
 
 	public boolean isInCheck(King king) {
+		if (king == null) return false;
 		for (Piece piece : getAllPieces(king.getColor().getOpposite())) {
 			if (pieceCreatesCheck(piece, king)) {
 				return true;

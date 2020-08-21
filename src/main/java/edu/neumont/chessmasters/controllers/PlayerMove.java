@@ -68,8 +68,12 @@ public class PlayerMove {
                 if (stalemate) {
                     setStatus(current + ", you have been forced into a STALEMATE! " + current.getOpposite() + ", I guess this sort of means you win.");
                     gameOver = true;
+                } else if (!board.isDeadPosition()) {
+                    setStatus("DRAW! Checkmate is no longer possible.");
+                    gameOver = true;
                 }
             }
+
             if (status != null) {
                 System.out.println(status);
                 setStatus(null);

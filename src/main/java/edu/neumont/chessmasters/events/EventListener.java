@@ -17,14 +17,15 @@ public class EventListener {
         if (event.isCastle()) {
             if (initialCheck) {
                 event.setCancelled(true);
-                ChessMasters.controller.setStatus("You can't castle to get out of check.");
+                if (!event.isQuiet())
+                    ChessMasters.controller.setStatus("You can't castle to get out of check.");
                 return;
             } else {
                 runCastleCheck(event, tempBoard, king);
             }
         } else {
 //        if (!event.getBoard().isGhostBoard && initialCheck) {
-            if (king.getLocation().equals(event.getPiece().getLocation())) {
+            if (king != null && king.getLocation().equals(event.getPiece().getLocation())) {
                 king.setLocation(event.getPassedLocation());
             }
 
@@ -38,9 +39,10 @@ public class EventListener {
 
             if (tempBoard.isInCheck(king)) {
                 if (initialCheck)
-                    ChessMasters.controller.setStatus("\nYour king would still be in check with that move. Try a different move.");
-                else
-                    ChessMasters.controller.setStatus("\nThat move would put your king in danger! Try a different move.");
+                    if (!event.isQuiet())
+                        ChessMasters.controller.setStatus("\nYour king would still be in check with that move. Try a different move.");
+                    else if (!event.isQuiet())
+                        ChessMasters.controller.setStatus("\nThat move would put your king in danger! Try a different move.");
                 event.setCancelled(true);
             }
         }
