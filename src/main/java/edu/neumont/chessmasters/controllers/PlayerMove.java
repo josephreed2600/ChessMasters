@@ -72,20 +72,20 @@ public class PlayerMove {
             StringBuilder sb = new StringBuilder();
             if (counter == 0)
                 sb.append("Welcome to Chess Masters");
-            sb.append("\n\n").append(counter % 2 == 0 ? "White" : "Black").append(", it's your turn:");
+            sb.append("\n\n");
 
             System.out.println(sb);
             String input = null;
-            boolean isInt;
+            boolean isInt = false;
 
 
             do {
 
                 positionOne = null;
                 positionTwo = null;
-                if(input != null)
+                if(input != null && !input.equalsIgnoreCase("board"))
                     System.out.println("Unrecognized command. Type 'help' for help.");
-                input = IOUtils.promptForString("Enter a choice: ");
+                input = IOUtils.promptForString((counter % 2 == 0 ? "White" : "Black") + ", it's your turn:\nEnter a choice: ").toLowerCase();
                 movePieceCheck = Pattern.matches("[A-Ha-h][1-8][\\s][A-Ha-h][1-8]", input);
 
                 if (movePieceCheck) {
@@ -99,6 +99,7 @@ public class PlayerMove {
                     input = "2";
                 } else if(input.equals("board")){
                     System.out.println("\n\n" + board);
+                    continue;
                 }
 
 
