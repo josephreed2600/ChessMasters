@@ -63,10 +63,12 @@ public class PlayerMove {
         boolean movePieceCheck;
         MoveResult result = null;
         do {
-            boolean stalemate = board.checkStalemate(current);
-            if(stalemate) {
-                setStatus(current + ", you have been forced into a STALEMATE! " + current.getOpposite() + ", I guess this sort of means you win.");
-                gameOver = true;
+            if (!gameOver) {
+                boolean stalemate = board.checkStalemate(current);
+                if (stalemate) {
+                    setStatus(current + ", you have been forced into a STALEMATE! " + current.getOpposite() + ", I guess this sort of means you win.");
+                    gameOver = true;
+                }
             }
             if (status != null) {
                 System.out.println(status);
@@ -89,7 +91,7 @@ public class PlayerMove {
 
                 positionOne = null;
                 positionTwo = null;
-                if(input != null && !input.equalsIgnoreCase("board"))
+                if (input != null && !input.equalsIgnoreCase("board"))
                     System.out.println("Unrecognized command. Type 'help' for help.");
                 input = IOUtils.promptForString((counter % 2 == 0 ? "White" : "Black") + ", it's your turn:\nEnter a choice: ").toLowerCase();
                 movePieceCheck = Pattern.matches("[A-Ha-h][1-8][\\s][A-Ha-h][1-8]", input);
@@ -103,7 +105,7 @@ public class PlayerMove {
 
                 } else if (input.equals("help")) {
                     input = "2";
-                } else if(input.equals("board")){
+                } else if (input.equals("board")) {
                     System.out.println("\n\n" + board);
                     continue;
                 }
