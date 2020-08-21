@@ -97,6 +97,8 @@ public class PlayerMove {
 
                 } else if (input.equals("help")) {
                     input = "2";
+                } else if(input.equals("board")){
+                    System.out.println("\n\n" + board);
                 }
 
 
