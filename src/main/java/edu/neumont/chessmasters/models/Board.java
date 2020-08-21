@@ -293,9 +293,38 @@ public class Board {
 			setSquare(to, p);
 			setSquare(from, null);
 
-			if (p instanceof Pawn && ((Pawn) p).shouldPromote()) { //Promote pawn to queen.
-				p = new Queen(p.getColor());
-				setSquare(to, p);
+			if (p instanceof Pawn && ((Pawn) p).shouldPromote()) { // Promote pawn to queen.
+				String choiceInput = "";
+				validInput = false;
+				while(validInput == false) {
+					try {
+						choiceInput = IOUtils.promptForString("What would you like to promote your piece to(Queen, Knight, Rook, or Bishop)?: ");
+					} catch (IOException e) {
+						System.out.println("Invalid input.");
+					}
+
+					choiceInput.toLowerCase();
+					switch(choiceInput) {
+						case "queen" :
+							p = new Queen(p.getColor());
+							setSquare(to, p);
+							validInput = true;
+						case "knight" :
+							p = new Knight(p.getColor());
+							setSquare(to, p);
+							validInput = true;
+						case "rook" :
+							p = new Rook(p.getColor());
+							setSquare(to, p);
+							validInput = true;
+						case "bishop" :
+							p = new Bishop(p.getColor());
+							setSquare(to, p);
+							validInput = true;
+						default:
+							System.out.println("Invalid piece.");
+					}
+				}
 			}
 
 			if (!this.isGhostBoard) {
