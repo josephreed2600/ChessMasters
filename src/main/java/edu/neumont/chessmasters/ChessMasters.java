@@ -71,7 +71,7 @@ public class ChessMasters {
 						break;
 
 					case "--debug":
-						System.out.println("[ debug ]\tDebug mode");
+						System.err.println("[ debug ]\tDebug mode");
 						options.debug = true;
 						options.needsWrapping = false;
 						break;
@@ -135,13 +135,13 @@ public class ChessMasters {
 						}
 						options.filePath = argv.remove(0);
 						options.fileContents = FileUtils.readFileFully(options.filePath);
-						System.out.println("Found file contents:\n" + options.fileContents);
+						System.err.println("Found file contents:\n" + options.fileContents);
 						break;
 
 					default:
 						// ignore unknown options
 						// actually, right now, let's complain about them
-						System.out.println("[ warn ] unknown option: " + option);
+						System.err.println("[ warn ] unknown option: " + option);
 						break;
 				}
 			}
@@ -149,6 +149,7 @@ public class ChessMasters {
 		}
 
     public static void main(String[] args) {
+			checkColorSupport();
 			GameSettings options = parseArgs(args);
 
         if (options.needsWrapping) {
@@ -161,9 +162,10 @@ public class ChessMasters {
 
     public static void startGame(GameSettings options) {
         boolean playAgain;
-        checkColorSupport();
+
+				// detect pipey things going on
         if (System.console() == null) {
-            System.out.println(" ----[ IMPORTANT ]----\n" +
+            System.err.println(" ----[ IMPORTANT ]----\n" +
                     "This game session is not directly attached to a Console object. (Either stdin or stdout is being redirected.)\n" +
                     "If you enter a null string for any prompt, the application WILL terminate.\n" +
                     "Chances are, you know what you're doing, but if you accessed the application in a normal way, please let the developers know that you're receiving this error.\n");
