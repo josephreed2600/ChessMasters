@@ -18,6 +18,8 @@ public class PlayerMove {
     public         String     positionOne;
     public         String     positionTwo;
 
+    public int movesSinceCap = 0;
+
     public PlayerMove() {
         this(new Board());
     }
@@ -68,8 +70,11 @@ public class PlayerMove {
                 if (stalemate) {
                     setStatus(current + ", you have been forced into a STALEMATE! " + current.getOpposite() + ", I guess this sort of means you win.");
                     gameOver = true;
-                } else if (!board.isDeadPosition()) {
+                } else if (board.isDeadPosition()) {
                     setStatus("DRAW! Checkmate is no longer possible.");
+                    gameOver = true;
+                } else if (movesSinceCap >= 50) {
+                    setStatus("It has been 50 moves since the last capture. The game ends in a draw");
                     gameOver = true;
                 }
             }

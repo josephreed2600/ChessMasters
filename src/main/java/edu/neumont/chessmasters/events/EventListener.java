@@ -38,11 +38,11 @@ public class EventListener {
 //        }
 
             if (tempBoard.isInCheck(king)) {
-                if (initialCheck)
+                if (initialCheck) {
                     if (!event.isQuiet())
                         ChessMasters.controller.setStatus("\nYour king would still be in check with that move. Try a different move.");
-                    else if (!event.isQuiet())
-                        ChessMasters.controller.setStatus("\nThat move would put your king in danger! Try a different move.");
+                } else if (!event.isQuiet())
+                    ChessMasters.controller.setStatus("\nThat move would put your king in danger! Try a different move.");
                 event.setCancelled(true);
             }
         }
@@ -53,17 +53,19 @@ public class EventListener {
         if (event.getBoard().isGhostBoard)
             return;
         boolean check = PlayerMove.inst().getBoard().isInCheck(event.getPiece().getColor().getOpposite());//PlayerMove.inst().getBoard().pieceCreatesCheck(event.getPiece());
-        String status = ChessMasters.controller.getStatus() == null ? "" : ChessMasters.controller.getStatus();
+        String status = ChessMasters.controller.getStatus() == null ? "" : ChessMasters.controller.getStatus() + "\n";
         if (check) {
-            ChessMasters.controller.setStatus(status + "\nCHECK");
+            ChessMasters.controller.setStatus(status + "CHECK");
         }
         boolean checkmate = PlayerMove.inst().getBoard().isInCheckmate(event.getPiece().getColor().getOpposite());
         if (check) {
             if (checkmate) {
-                ChessMasters.controller.setStatus(status + "\nCHECKMATE! " + (event.getPiece().getColor() == PieceColor.WHITE ? "1-0" : "0-1"));
+                ChessMasters.controller.setStatus(status + "CHECKMATE! " + (event.getPiece().getColor() == PieceColor.WHITE ? "1-0" : "0-1"));
                 ChessMasters.controller.setGameOver();
             }
         }
+
+        ChessMasters.controller.movesSinceCap++;
     }
 
     @EventHandler
@@ -77,9 +79,11 @@ public class EventListener {
             extra = " by performing an En Passant!";
         }
 
+        String status = ChessMasters.controller.getStatus() == null ? "" : "\n" + ChessMasters.controller.getStatus();
         if (!(target instanceof PassantTarget))
             ChessMasters.controller.setStatus("The " + target.getColor().toString().toLowerCase() + " " + target.getName().toLowerCase() +
-                    " was captured by the " + attacker.getColor().toString().toLowerCase() + " " + attacker.getName().toLowerCase() + extra);
+                    " was captured by the " + attacker.getColor().toString().toLowerCase() + " " + attacker.getName().toLowerCase() + extra + status);
+        ChessMasters.controller.movesSinceCap = 0;
     }
 
     private void runCastleCheck(PrePieceMoveEvent event, Board tempBoard, King king) {

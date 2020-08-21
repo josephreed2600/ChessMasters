@@ -343,16 +343,11 @@ public class Board {
 			setSquare(to, p);
 			setSquare(from, null);
 
+			boolean passant = false;
 			if (victim != null) {
-				boolean passant = p instanceof Pawn && victim instanceof PassantTarget;
-				if (p instanceof Pawn && from.getX() != p.getLocation().getX()) {//The location has been updated to the 'to' location
-					if (victim instanceof PassantTarget) {
-						setSquare(((PassantTarget) victim).getOwner().getLocation(), null);
-					}
-				}
-				if (!this.isGhostBoard) {
-					capture.setPassant(passant);
-					EventRegistry.callEvents(capture);
+				passant = p instanceof Pawn && victim instanceof PassantTarget;
+				if (passant && from.getX() != p.getLocation().getX()) {//The location has been updated to the 'to' location
+					setSquare(((PassantTarget) victim).getOwner().getLocation(), null);
 				}
 			}
 
@@ -367,6 +362,10 @@ public class Board {
 			if (!this.isGhostBoard) {
 				PostPieceMoveEvent post = new PostPieceMoveEvent(p, this);
 				EventRegistry.callEvents(post);
+				if (victim != null) {
+					capture.setPassant(passant);
+					EventRegistry.callEvents(capture);
+				}
 			}
 		}
 		return true;
