@@ -57,11 +57,17 @@ public class PlayerMove {
 
     //Returns a boolean dependent on if the player intends to quit the game or not.
     public boolean MenuPrompt() throws EOFException {
-        board.clearPassant(counter % 2 == 0 ? PieceColor.WHITE : PieceColor.BLACK);
+        PieceColor current = counter % 2 == 0 ? PieceColor.WHITE : PieceColor.BLACK;
+        board.clearPassant(current);
         System.out.println("\n\n" + board);
         boolean movePieceCheck;
         MoveResult result = null;
         do {
+            boolean stalemate = board.checkStalemate(current);
+            if(stalemate) {
+                setStatus(current + ", you have been forced into a STALEMATE! " + current.getOpposite() + ", I guess this sort of means you win.");
+                gameOver = true;
+            }
             if (status != null) {
                 System.out.println(status);
                 setStatus(null);
