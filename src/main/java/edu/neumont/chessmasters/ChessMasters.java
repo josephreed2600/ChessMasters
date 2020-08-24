@@ -183,6 +183,8 @@ public class ChessMasters {
 //                Board board = new Board("r2qk2r/8/8/8/8/8/8/R2QK2R w KQkq - 0 1");
                 controller = PlayerMove.inst(new Board());
                 controller.run(options);
+                if (IOUtils.promptForBoolean("Dump move log? (y/n)", "y", "n"))
+									controller.dumpMoveLog();
                 playAgain = IOUtils.promptForBoolean("Play again? (y/n)", "y", "n");
             } while (playAgain);
         } catch (EOFException e) {

@@ -146,7 +146,7 @@ public class PlayerMove {
 					case "moves":
 					case "history":
 					case "dump":
-						System.out.println("\nMove history:\n\n" + board.getMoveHistory() + "\n");
+						dumpMoveLog();
 						continue;
 					case "help":
 					case "?":
@@ -394,5 +394,9 @@ public class PlayerMove {
         FAILED
     }
 		*/
+
+		public void dumpMoveLog() {
+			System.out.println("\nMove history:\n\n" + board.getMoveHistory() + "\n");
+		}
 
 }

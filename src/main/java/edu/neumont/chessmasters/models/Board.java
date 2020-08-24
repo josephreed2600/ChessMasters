@@ -109,7 +109,7 @@ public class Board {
 
 	public Board(Board original, boolean isGhost) {
 		this.squares = new Piece[8][8];
-		this.moves = original.getMoves();
+		this.moves = (ArrayList<Move>)original.getMoves().clone();
 		this.isGhostBoard = isGhost;
 
 		// copy pieces over
