@@ -5,6 +5,7 @@ import edu.neumont.chessmasters.models.Move;
 import edu.neumont.chessmasters.models.GameSettings;
 import edu.neumont.chessmasters.models.pieces.Piece;
 import edu.neumont.chessmasters.models.pieces.PieceColor;
+import edu.neumont.chessmasters.exceptions.IncompleteMoveException;
 import me.travja.utils.utils.IOUtils;
 
 import java.io.EOFException;
@@ -18,6 +19,7 @@ public class PlayerMove {
     private        int        counter  = -1;
     private        String     status   = null;
     private        boolean    gameOver = false;
+		private        GameSettings options;
     public         String     positionOne;
     public         String     positionTwo;
 
@@ -35,6 +37,8 @@ public class PlayerMove {
 
 		public boolean isBlack() { return isBlack(counter); }
 		public static boolean isBlack(int halfturn) { return halfturn % 2 == 1; }
+
+		public GameSettings getSettings() { return options; }
 
     private PlayerMove() {
         this(new Board());
@@ -61,13 +65,12 @@ public class PlayerMove {
     public Board getBoard() { return board; }
 
     public void run(GameSettings options) throws EOFException {
+			this.options = options;
         gameOver = false;
         boolean keepPlaying;
         do {
             keepPlaying = RequestMove();
-						if (this.getStatus() != null) {
-							System.out.println(this.getStatus());
-						}
+						this.flushStatus();
 						if (this.gameOver) {
 							return;
 						}
@@ -77,8 +80,16 @@ public class PlayerMove {
     public void setGameOver() { this.gameOver = true; }
 
     public void setStatus(String status) { this.status = status; }
+    public void setStatusIfEmpty(String status) { if (this.getStatus() == null) this.setStatus(status); }
 
     public String getStatus() { return status; }
+
+		public void flushStatus() {
+			if (this.getStatus() != null) {
+				System.out.println(this.getStatus());
+			}
+			this.setStatus(null);
+		}
 
 		/**
 		 * Does not return until a valid move is made or the user forfeits.
@@ -108,7 +119,7 @@ public class PlayerMove {
 		 // 3. Do-while(not a valid move or a forfeit):
 			do {
 		 // 3.1 Request user input
-				System.out.println(getColorName() + " to move");
+				System.out.println("\n" + getColorName() + " to move");
 				String input = IOUtils.promptForString(getTurn() + (isWhite() ? ". " : "... "));
 		 // 3.2 Check whether it's a predefined command
 				switch (input) {
@@ -117,7 +128,8 @@ public class PlayerMove {
 						System.exit(0); // exits application
 					case "forfeit":
 		 // 3.2.1 Execute command
-						System.out.println(getColorName() + " has elected to forfeit. " + (isWhite() ? "0-1" : "1-0"));
+						this.setStatus(getColorName() + " has elected to forfeit. " + (isWhite() ? "0-1" : "1-0"));
+						this.flushStatus();
 						return false; // exits method, indicating game is over
 					case "help":
 					case "?":
@@ -131,18 +143,31 @@ public class PlayerMove {
 				try {
 
 		 // 3.3 Attempt to parse as a move
-					Move move = parseMove(input, board);
+					Move move;
+					try {
+						move = Move.fromFreeform(input, board);
+					} catch (IncompleteMoveException e) {
+						// we'll prompt for more input one more time
+						// if they don't complete the move, screw them
+						System.out.print(isWhite() ? "  " : "    "); // i guess the next line trims prompts
+						input += " " + IOUtils.promptForString("to: ");
+						move = Move.fromFreeform(input, board);
+					}
 
 		 // 3.3.1 If successful, attempt to apply the resultant move
 					if (AttemptMove(move, board, getColor())) return true; // exits the method, indicating a successful move
 					else {
-							System.err.println("Illegal move");
+						this.setStatusIfEmpty("Illegal move");
+						this.flushStatus();
+
 		 // 3.3.2 If either of these fails, continue prompting
 							continue;
 					}
 
 				} catch (Exception e) {
-					System.err.println("Invalid move syntax or unrecognized command. Try specifying a source and a destination square, like so: a2 a4");
+					this.setStatusIfEmpty("Invalid move syntax or unrecognized command: \""+input+"\". Try specifying a source and a destination square, like so: a2 a4");
+					this.flushStatus();
+					
 		 // 3.3.2 If either of these fails, continue prompting
 					continue;
 				}
@@ -151,15 +176,6 @@ public class PlayerMove {
 
 			// we better not get here tho
 			//throw new IllegalStateException("We escaped a do-while(true) in PlayerMove");
-		}
-
-		public Move parseMove(String input) {
-			String[] squares = input.split(" ");
-			Move move = new Move(squares[0], squares[1]);
-			return move;
-		}
-		public Move parseMove(String input, Board board) {
-			return parseMove(input);
 		}
 
 		/*
@@ -247,22 +263,22 @@ public class PlayerMove {
 */
 
 	// true for success, false for failure
-	// 1. Ensure that the source square has a piece
-	// 2. Ensure that the piece to move is of the correct color
-	// 3. Attempt the move
+	// 0. Ensure that the source square has a piece
+	// 1. Ensure that the piece to move is of the correct color
+	// 2. Attempt the move
 	public boolean AttemptMove(Move move, Board board, PieceColor color) {
 		Piece p = board.getSquare(move.from);
-	// 1. Ensure that the source square has a piece
+	// 0. Ensure that the source square has a piece
 		if (p == null) {
-			System.out.println("The source square (" + move.from.toString() + ") is empty");
+			this.setStatus("The source square (" + move.from.toString() + ") is empty");
 			return false;
 		}
-	// 2. Ensure that the piece to move is of the correct color
+	// 1. Ensure that the piece to move is of the correct color
 		if (p.getColor() != color) {
-			System.out.println("The requested piece (" + p.getNotation() + move.from.toString() + ") is of the wrong color");
+			this.setStatus("The requested piece (" + p.getNotation() + move.from.toString() + ") is of the wrong color");
 			return false;
 		}
-	// 3. Attempt the move
+	// 2. Attempt the move
 		return board.movePiece(move);
 	}
 
@@ -311,6 +327,7 @@ public class PlayerMove {
 	}
 	*/
 
+/*
     private boolean CheckMove(String po1) {
         boolean checkerOne = Pattern.matches("[A-Ha-h][1-8]", po1);
         return checkerOne;
@@ -327,6 +344,7 @@ public class PlayerMove {
 
         return false;
     }
+		*/
 
     private void helpMenu() throws EOFException {
         StringBuilder helper = new StringBuilder(" --[ Helper commands ]-- ");
@@ -337,13 +355,16 @@ public class PlayerMove {
                 .append("but could be intercepted by an opposing piece. If the opportunity is not taken, it is lost.\n");
         //System.out.println(
         setStatus(helper.toString());
+				this.flushStatus();
     }
 
 
+		/*
     public enum MoveResult {
         QUIT,
         MOVED,
         FAILED
     }
+		*/
 
 }

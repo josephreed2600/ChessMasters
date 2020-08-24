@@ -181,7 +181,7 @@ public class ChessMasters {
             do {
                 //Run setup here.
 //                Board board = new Board("r2qk2r/8/8/8/8/8/8/R2QK2R w KQkq - 0 1");
-                controller = PlayerMove.inst();
+                controller = PlayerMove.inst(new Board());
                 controller.run(options);
                 playAgain = IOUtils.promptForBoolean("Play again? (y/n)", "y", "n");
             } while (playAgain);
