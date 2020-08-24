@@ -43,11 +43,33 @@ public class ChessMasters {
 				"\t-h  --help              \tDisplay this help and exit\n" +
 				"\t-c  --color   <tristate>\tConfigure color support\n" +
 				"\t-u  --unicode <tristate>\tConfigure unicode support\n" +
-				"\t-t  --trace   <tristate>\tConfigure tracing the last move made\n" +
+				"\t-t  --trace   <tristate>\tConfigure tracing the last move made (requires color)\n" +
 				"\t-f  --flip    <tristate>\tConfigure flipping the board to face the player\n" +
 				"\t-d  --debug             \tEnable debug mode\n" +
 				"\n" +
 				"\t<tristate>\tOne of { yes | no | on | off | 1 | 0 | true | false | enable | disable | auto }\n";
+
+		public static Boolean parseTristate(List<String> argv, String option) {
+			if (argv.size() < 1) {
+				System.err.println(
+						"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
+				return null;
+			}
+			String input = argv.remove(0);
+			switch (input) {
+				case "true":  case "yes": case "on":  case "1": case "enable":
+					return true;
+				case "false": case "no":  case "off": case "0": case "disable":
+					return false;
+				case "auto":
+					return null;
+				default:
+					System.err.println(
+							"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + input
+							+ ". Ignoring");
+					return null;
+			}
+		}
 
 		public static GameSettings parseArgs(String[] args) {
 			GameSettings options = new GameSettings(args);
@@ -83,6 +105,8 @@ public class ChessMasters {
 
 					case "-c":
 					case "--color":
+						options.color = parseTristate(argv, option);
+						/*
 						if (argv.size() < 1) {
 							System.err.println(
 									"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
@@ -104,15 +128,19 @@ public class ChessMasters {
 										"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + colorSetting
 										+ ". Ignoring");
 						}
+						*/
 						break;
 
 					case "-u":
 					case "--unicode":
+						options.unicode = parseTristate(argv, option);
+						/*
 						if (argv.size() < 1) {
 							System.err.println(
 									"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
 							break;
 						}
+						options.color = parseTristate(argv.remove(0), option);
 						String unicodeSetting = argv.remove(0);
 						switch (unicodeSetting) {
 							case "true":  case "yes": case "on":  case "1": case "enable":
@@ -129,10 +157,13 @@ public class ChessMasters {
 										"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + unicodeSetting
 										+ ". Ignoring");
 						}
+						*/
 						break;
 
 					case "-t":
 					case "--trace":
+						options.traceMoves = parseTristate(argv, option);
+						/*
 						if (argv.size() < 1) {
 							System.err.println(
 									"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
@@ -154,10 +185,14 @@ public class ChessMasters {
 										"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + traceSetting
 										+ ". Ignoring");
 						}
+						*/
 						break;
 
 					case "-f":
 					case "--flip":
+						Boolean temp = parseTristate(argv, option);
+						if (temp != null) options.flip = temp;
+						/*
 						if (argv.size() < 1) {
 							System.err.println(
 									"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
@@ -176,6 +211,7 @@ public class ChessMasters {
 										"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + flipSetting
 										+ ". Ignoring");
 						}
+						*/
 						break;
 
 						/*
