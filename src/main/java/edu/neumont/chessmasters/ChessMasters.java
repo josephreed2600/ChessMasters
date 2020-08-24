@@ -42,7 +42,9 @@ public class ChessMasters {
 			"Options:\n"+
 				"\t-h  --help              \tDisplay this help and exit\n" +
 				"\t-c  --color   <tristate>\tConfigure color support\n" +
-				"\t-u  --unicode <tristate>\tonfigure unicode support\n" +
+				"\t-u  --unicode <tristate>\tConfigure unicode support\n" +
+				"\t-t  --trace   <tristate>\tConfigure tracing the last move made\n" +
+				"\t-f  --flip    <tristate>\tConfigure flipping the board to face the player\n" +
 				"\t-d  --debug             \tEnable debug mode\n" +
 				"\n" +
 				"\t<tristate>\tOne of { yes | no | on | off | 1 | 0 | true | false | enable | disable | auto }\n";
@@ -129,17 +131,66 @@ public class ChessMasters {
 						}
 						break;
 
+					case "-t":
+					case "--trace":
+						if (argv.size() < 1) {
+							System.err.println(
+									"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
+							break;
+						}
+						String traceSetting = argv.remove(0);
+						switch (traceSetting) {
+							case "true":  case "yes": case "on":  case "1": case "enable":
+								options.traceMoves = true;
+								break;
+							case "false": case "no":  case "off": case "0": case "disable":
+								options.traceMoves = false;
+								break;
+							case "auto":
+								options.traceMoves = null;
+								break;
+							default:
+								System.err.println(
+										"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + traceSetting
+										+ ". Ignoring");
+						}
+						break;
+
+					case "-f":
+					case "--flip":
+						if (argv.size() < 1) {
+							System.err.println(
+									"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
+							break;
+						}
+						String flipSetting = argv.remove(0);
+						switch (flipSetting) {
+							case "true":  case "yes": case "on":  case "1": case "enable": case "auto":
+								options.flip = true;
+								break;
+							case "false": case "no":  case "off": case "0": case "disable":
+								options.flip = false;
+								break;
+							default:
+								System.err.println(
+										"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + flipSetting
+										+ ". Ignoring");
+						}
+						break;
+
+						/*
 					case "--file":
 					case "-f":
 						// handle files here
 						if (argv.size() < 1) {
-							System.err.println("[ warn ]\tOption " + option + " expects a file path; received nothing. Ignoring");
+							System.err.println("[ warn ] Option " + option + " expects a file path; received nothing. Ignoring");
 							break;
 						}
 						options.filePath = argv.remove(0);
 						options.fileContents = FileUtils.readFileFully(options.filePath);
 						System.err.println("Found file contents:\n" + options.fileContents);
 						break;
+						*/
 
 					default:
 						// ignore unknown options
@@ -174,8 +225,9 @@ public class ChessMasters {
                     "Chances are, you know what you're doing, but if you accessed the application in a normal way, please let the developers know that you're receiving this error.\n");
         }
 
-				if(options.color   != null) Utils.USE_ANSI    = options.color;
-				if(options.unicode != null) Utils.USE_UNICODE = options.unicode;
+				if(options.color      != null) Utils.USE_ANSI     = options.color;
+				if(options.unicode    != null) Utils.USE_UNICODE  = options.unicode;
+				if(options.traceMoves == null) options.traceMoves = Utils.USE_ANSI; // by default, trace moves if color is allowed
 
         try {
             do {

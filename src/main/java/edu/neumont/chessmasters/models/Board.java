@@ -460,7 +460,10 @@ public class Board {
 
 	@Override
 	public String toString() {
+		return this.toString(PieceColor.WHITE, false);
+	}
 
+	public String toString(PieceColor side, boolean highlightLast) {
 		// Build the top edge
 		String top = Utils.buildRow(
 				"   " + Utils.Drawing.Corners.topLeft(),
@@ -492,20 +495,35 @@ public class Board {
 		StringBuilder sb_out = new StringBuilder();
 
 		String prefix = top;
-		int rankIndex = 8;
 
 		boolean squareColor = true; // white, starting at a8
 
 		// Build each row
 		for (int row = 7; row >= 0; row--) {
-			Piece[] rank = squares[row];
+			Piece[] rank = squares[side == PieceColor.WHITE ? row : 7 - row];
 			sb_out.append(prefix);
 
-			sb_out.append(' ').append(rankIndex--).append(' ');
-			for (Piece piece : rank) {
+			sb_out.append(' ').append(side == PieceColor.WHITE ? row + 1 : 8 - row).append(' ');
+			for (int col = 0; col < 8; col++) {
+				Piece piece = rank[side == PieceColor.WHITE ? col : 7 - col];
+				sb_out.append(Utils.Drawing.Edges.vertical());
+
+				// highlight last move if applicable
+				if (highlightLast && getMoves().size() > 0) {
+					Location thisSquare = (side == PieceColor.WHITE ? new Location(col, row) : new Location(7-col, 7-row));
+					Move lastMove = getMoves().get(getMoves().size()-1);
+					if (thisSquare.equals(lastMove.from)) {
+						sb_out.append(Utils.Styles.sourceSquare());
+					} else if (thisSquare.equals(lastMove.to)) {
+						sb_out.append(Utils.Styles.destSquare());
+					} else {
+						sb_out.append(squareColor ? Utils.Styles.lightSquare() : Utils.Styles.darkSquare());
+					}
+				} else {
+					sb_out.append(squareColor ? Utils.Styles.lightSquare() : Utils.Styles.darkSquare());
+				}
+
 				sb_out
-					.append(Utils.Drawing.Edges.vertical())
-					.append(squareColor ? Utils.Styles.lightSquare() : Utils.Styles.darkSquare())
 					.append(' ')
 					.append(piece == null ? '-' : piece)
 					.append(' ')
@@ -524,7 +542,10 @@ public class Board {
 		}
 
 		sb_out.append(bottom);
-		sb_out.append("     a   b   c   d   e   f   g   h  ");
+		if (side == PieceColor.WHITE)
+			sb_out.append("     a   b   c   d   e   f   g   h  ");
+		else
+			sb_out.append("     h   g   f   e   d   c   b   a  ");
 
 		return sb_out.toString();
 	}

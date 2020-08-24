@@ -32,6 +32,8 @@ public class Utils {
 
 		public static String lightSquare   () { return  Background.darkgray(); }
 		public static String darkSquare    () { return  Background.black(); }
+		public static String sourceSquare  () { return  Background.red(); }
+		public static String destSquare    () { return  Background.green(); }
 		public static String lightPiece    () { return  bold() + Foreground.white(); }
 		public static String darkPiece     () { return  bold() + Foreground.lightgray(); }
 		public static String afterPiece    () { return  normal(); }
