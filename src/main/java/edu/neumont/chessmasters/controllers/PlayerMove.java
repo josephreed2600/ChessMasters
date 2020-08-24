@@ -181,11 +181,19 @@ public class PlayerMove {
 		/*
     //Returns a boolean dependent on if the player intends to quit the game or not.
     public boolean MenuPrompt() throws EOFException {
-        board.clearPassant(counter % 2 == 0 ? PieceColor.WHITE : PieceColor.BLACK);
+        PieceColor current = counter % 2 == 0 ? PieceColor.WHITE : PieceColor.BLACK;
+        board.clearPassant(current);
         System.out.println("\n\n" + board);
         boolean movePieceCheck;
         MoveResult result = null;
         do {
+            if (!gameOver) {
+                boolean stalemate = board.checkStalemate(current);
+                if (stalemate) {
+                    setStatus(current + ", you have been forced into a STALEMATE! " + current.getOpposite() + ", I guess this sort of means you win.");
+                    gameOver = true;
+                }
+            }
             if (status != null) {
                 System.out.println(status);
                 setStatus(null);
@@ -196,20 +204,20 @@ public class PlayerMove {
             StringBuilder sb = new StringBuilder();
             if (counter == 0)
                 sb.append("Welcome to Chess Masters");
-            sb.append("\n\n").append(counter % 2 == 0 ? "White" : "Black").append(", it's your turn:");
+            sb.append("\n\n");
 
             System.out.println(sb);
             String input = null;
-            boolean isInt;
+            boolean isInt = false;
 
 
             do {
 
                 positionOne = null;
                 positionTwo = null;
-                if(input != null)
+                if (input != null && !input.equalsIgnoreCase("board"))
                     System.out.println("Unrecognized command. Type 'help' for help.");
-                input = IOUtils.promptForString("Enter a choice: ");
+                input = IOUtils.promptForString((counter % 2 == 0 ? "White" : "Black") + ", it's your turn:\nEnter a choice: ").toLowerCase();
                 movePieceCheck = Pattern.matches("[A-Ha-h][1-8][\\s][A-Ha-h][1-8]", input);
 
                 if (movePieceCheck) {
@@ -221,6 +229,9 @@ public class PlayerMove {
 
                 } else if (input.equals("help")) {
                     input = "2";
+                } else if (input.equals("board")) {
+                    System.out.println("\n\n" + board);
+                    continue;
                 }
 
 
