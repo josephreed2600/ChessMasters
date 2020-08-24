@@ -318,7 +318,10 @@ public class Board {
 	public boolean movePiece(Location from, Location to) {
 		Piece p = getSquare(from);
 		Piece target = getSquare(to);
-		if (p == null) return false;
+		if (p == null) {
+			ChessMasters.controller.setStatus("The source square (" + from.toString() + ") is empty");
+			return false;
+		}
 		if (!validateMove(p, to)) return false;
 		if (isCastle(new Move(from, to))) {
 			boolean castled = castle((King) p, (Rook) target);
