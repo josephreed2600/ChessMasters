@@ -27,6 +27,16 @@ public class Board {
 		if (p != null) p.setLocation(l);
 	}
 
+	private ArrayList<Move> moves;
+
+	public ArrayList<Move> getMoves() { return moves; }
+	public String getMoveHistory() {
+		StringBuilder out = new StringBuilder();
+		for (Move move : getMoves())
+			out.append(move.toString() + "\n");
+		return out.toString();
+	}
+
 	// Indicates whether to fire events. Ghost boards are used in determining checkmate,
 	// so we don't want to issue alerts of captures made on them.
 	public final boolean isGhostBoard;
@@ -99,6 +109,7 @@ public class Board {
 
 	public Board(Board original, boolean isGhost) {
 		this.squares = new Piece[8][8];
+		this.moves = original.getMoves();
 		this.isGhostBoard = isGhost;
 
 		// copy pieces over
@@ -120,6 +131,7 @@ public class Board {
 	// create board from FEN
 	public Board(String fen) {
 		this.squares = new Piece[8][8];
+		moves = new ArrayList<Move>();
 		this.isGhostBoard = false;
 
 		String[] components = fen.split(" ");
@@ -333,6 +345,9 @@ public class Board {
 				EventRegistry.callEvents(post);
 			}
 		}
+
+		// if we made it this far, the move is ok
+		moves.add(new Move(from, to));
 		return true;
 	}
 

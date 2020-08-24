@@ -143,6 +143,11 @@ public class PlayerMove {
 					case "board":
 						System.out.println("\n\n" + board + "\n");
 						continue; // skips rest of loop and asks again for a move
+					case "moves":
+					case "history":
+					case "dump":
+						System.out.println("\nMove history:\n\n" + board.getMoveHistory() + "\n");
+						continue;
 					case "help":
 					case "?":
 		 // 3.2.1 Execute command

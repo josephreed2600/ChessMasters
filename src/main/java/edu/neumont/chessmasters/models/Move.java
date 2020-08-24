@@ -9,8 +9,26 @@ import java.util.regex.Pattern;
 public class Move {
 
 		public final Location from, to;
+		//public final String piece, id; // id for rank/file if ambiguous
+
+		/*
+		public Move(Location from, Location to, String piece) {
+			this.from = from;
+			this.to = to;
+			//this.piece = piece;
+		}
+
+		public Move(Location from, Location to, Piece piece) {
+			this(from, to, piece.getNotation().toUppercase());
+		}
+
+		public Move(String from, String to, Piece piece) {
+			this(new Location(from), new Location(to), piece);
+		}
+		*/
 
 		public Move(Location from, Location to) {
+			//this(from, to, "");
 			this.from = from;
 			this.to = to;
 		}
@@ -21,7 +39,7 @@ public class Move {
 
 		public static Move fromSrcDest(String input) {
 			if (ChessMasters.controller.getSettings().debug)
-				System.err.println("[ debug ]\tParsing source-destination syntax");
+				System.err.println("[ debug ] Parsing source-destination syntax");
 			String[] squares = input.split(" ");
 			return new Move(squares[0], squares[1]);
 		}
@@ -35,4 +53,7 @@ public class Move {
 			}
 			throw new UnsupportedOperationException("I don't know how to parse the move described by \"" + input + "\"");
 		}
+
+		public String toString() { return from + " " + to; }
+		//public String toPGN() { return piece + id + (capture?"x":"") + to; }
 }
