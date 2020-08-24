@@ -106,112 +106,22 @@ public class ChessMasters {
 					case "-c":
 					case "--color":
 						options.color = parseTristate(argv, option);
-						/*
-						if (argv.size() < 1) {
-							System.err.println(
-									"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
-							break;
-						}
-						String colorSetting = argv.remove(0);
-						switch (colorSetting) {
-							case "true":  case "yes": case "on":  case "1": case "enable":
-								options.color = true;
-								break;
-							case "false": case "no":  case "off": case "0": case "disable":
-								options.color = false;
-								break;
-							case "auto":
-								options.color = null;
-								break;
-							default:
-								System.err.println(
-										"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + colorSetting
-										+ ". Ignoring");
-						}
-						*/
 						break;
 
 					case "-u":
 					case "--unicode":
 						options.unicode = parseTristate(argv, option);
-						/*
-						if (argv.size() < 1) {
-							System.err.println(
-									"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
-							break;
-						}
-						options.color = parseTristate(argv.remove(0), option);
-						String unicodeSetting = argv.remove(0);
-						switch (unicodeSetting) {
-							case "true":  case "yes": case "on":  case "1": case "enable":
-								options.unicode = true;
-								break;
-							case "false": case "no":  case "off": case "0": case "disable":
-								options.unicode = false;
-								break;
-							case "auto":
-								options.unicode = null;
-								break;
-							default:
-								System.err.println(
-										"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + unicodeSetting
-										+ ". Ignoring");
-						}
-						*/
 						break;
 
 					case "-t":
 					case "--trace":
 						options.traceMoves = parseTristate(argv, option);
-						/*
-						if (argv.size() < 1) {
-							System.err.println(
-									"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
-							break;
-						}
-						String traceSetting = argv.remove(0);
-						switch (traceSetting) {
-							case "true":  case "yes": case "on":  case "1": case "enable":
-								options.traceMoves = true;
-								break;
-							case "false": case "no":  case "off": case "0": case "disable":
-								options.traceMoves = false;
-								break;
-							case "auto":
-								options.traceMoves = null;
-								break;
-							default:
-								System.err.println(
-										"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + traceSetting
-										+ ". Ignoring");
-						}
-						*/
 						break;
 
 					case "-f":
 					case "--flip":
 						Boolean temp = parseTristate(argv, option);
 						if (temp != null) options.flip = temp;
-						/*
-						if (argv.size() < 1) {
-							System.err.println(
-									"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
-							break;
-						}
-						String flipSetting = argv.remove(0);
-						switch (flipSetting) {
-							case "true":  case "yes": case "on":  case "1": case "enable": case "auto":
-								options.flip = true;
-								break;
-							case "false": case "no":  case "off": case "0": case "disable":
-								options.flip = false;
-								break;
-							default:
-								System.err.println(
-										"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + flipSetting
-										+ ". Ignoring");
-						}
-						*/
 						break;
 
 						/*
