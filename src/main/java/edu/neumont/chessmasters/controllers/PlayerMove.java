@@ -96,6 +96,7 @@ public class PlayerMove {
 		 * 0. Increment the half-turn counter
 		 * 1. Clear en passant targets for this player
 		 * 2. Print board
+		 * 2.1 If we're in a stalemate, say so and end the game
 		 * 3. Do-while(not a valid move or a forfeit):
 		 * 3.1 Request user input
 		 * 3.2 Check whether it's a predefined command
@@ -116,6 +117,13 @@ public class PlayerMove {
 		 // 2. Print board
 			System.out.println("\n\n" + board);
 
+		 // 2.1 If we're in a stalemate, say so and end the game
+			if (!gameOver && board.checkStalemate(getColor())) {
+				this.setStatus(getColorName() + " has been forced into a stalemate. 1/2-1/2");
+				this.setGameOver();
+				return false;
+			}
+
 		 // 3. Do-while(not a valid move or a forfeit):
 			do {
 		 // 3.1 Request user input
@@ -130,12 +138,16 @@ public class PlayerMove {
 		 // 3.2.1 Execute command
 						this.setStatus(getColorName() + " has elected to forfeit. " + (isWhite() ? "0-1" : "1-0"));
 						this.flushStatus();
+						this.setGameOver();
 						return false; // exits method, indicating game is over
+					case "board":
+						System.out.println("\n\n" + board + "\n");
+						continue; // skips rest of loop and asks again for a move
 					case "help":
 					case "?":
 		 // 3.2.1 Execute command
 						helpMenu();
-						continue; // skips rest of loop
+						continue; // skips rest of loop and asks again for a move
 		 // 3.2.2 Continue if it wasn't a forfeit
 					default: break; // carries on with loop
 				}
@@ -149,7 +161,7 @@ public class PlayerMove {
 					} catch (IncompleteMoveException e) {
 						// we'll prompt for more input one more time
 						// if they don't complete the move, screw them
-						System.out.print(isWhite() ? "  " : "    "); // i guess the next line trims prompts
+						//System.out.print(isWhite() ? "  " : "    "); // i guess the next line trims prompts
 						input += " " + IOUtils.promptForString("to: ");
 						move = Move.fromFreeform(input, board);
 					}
