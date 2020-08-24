@@ -182,6 +182,9 @@ public class Board {
 							if ((file == 0 && !castling.contains("q")) || (file == 7 && !castling.contains("k")))
 								piece.setNumMoves(1);
 						}
+					} else if (piece instanceof Pawn) {
+						if ((color == PieceColor.WHITE && rank != 1) || (color == PieceColor.BLACK && rank != 6))
+							piece.setNumMoves(1); //No double moving!
 					}
 				} catch (UnsupportedOperationException uoe) {
 					throw new IllegalArgumentException("Invalid character in FEN string: " + p);
@@ -216,10 +219,10 @@ public class Board {
 
 	public String toFEN() {
 		StringBuilder ret = new StringBuilder();
-		for (int file = 7; file >= 0; file--) { //Build the layout
+		for (int rank = 7; rank >= 0; rank--) { //Build the layout
 			int empty = 0;
-			for (int rank = 0; rank < 8; rank++) {
-				Piece p = getSquare(new Location(rank, file));
+			for (int file = 0; file < 8; file++) {
+				Piece p = getSquare(new Location(file, rank));
 				if (p == null || p instanceof PassantTarget) {
 					empty++;
 					continue;
@@ -234,7 +237,7 @@ public class Board {
 			if (empty > 0)
 				ret.append(empty);
 
-			if (file != 0)
+			if (rank != 0)
 				ret.append("/");
 		}
 
