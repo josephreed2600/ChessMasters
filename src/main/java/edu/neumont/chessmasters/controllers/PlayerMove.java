@@ -47,6 +47,10 @@ public class PlayerMove {
         return halfturn / 2 + 1;
     }
 
+    public void setCounter(int count) {
+        this.counter = count;
+    }
+
     public boolean isWhite() {
         return isWhite(counter);
     }
@@ -168,7 +172,7 @@ public class PlayerMove {
                 this.setGameOver();
                 return false;
             } else if (movesSinceCap >= 50) {
-                setStatus("It has been 50 moves since the last capture. The game ends in a draw");
+                setStatus("It has been 50 moves since the last capture or pawn advancement. The game ends in a draw");
                 this.setGameOver();
                 return false;
             }

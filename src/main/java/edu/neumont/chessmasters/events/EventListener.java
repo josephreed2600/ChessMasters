@@ -65,7 +65,10 @@ public class EventListener {
             }
         }
 
-        ChessMasters.controller.movesSinceCap++;
+        if (event.getPiece() instanceof Pawn)
+            ChessMasters.controller.movesSinceCap = 0;
+        else
+            ChessMasters.controller.movesSinceCap++;
     }
 
     @EventHandler
