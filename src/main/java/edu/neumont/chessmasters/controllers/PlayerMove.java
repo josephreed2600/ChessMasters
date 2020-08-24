@@ -14,17 +14,14 @@ public class PlayerMove {
 
     private        Board        board;
     private static PlayerMove   inst;
-    // Half-turns, starting at 0. To get turn number, (counter/2) + 1
-    private        int          counter       = -1;
     private        String       status        = null;
     private        boolean      gameOver      = false;
     private        GameSettings options;
     public         String       positionOne;
     public         String       positionTwo;
-    public         int          movesSinceCap = 0;
 
     public String getColorName() {
-        return getColorName(counter);
+        return getColorName(board.getCounter());
     }
 
     public static String getColorName(int halfturn) {
@@ -32,7 +29,7 @@ public class PlayerMove {
     }
 
     public PieceColor getColor() {
-        return getColor(counter);
+        return getColor(board.getCounter());
     }
 
     public static PieceColor getColor(int halfturn) {
@@ -40,19 +37,15 @@ public class PlayerMove {
     }
 
     public int getTurn() {
-        return getTurn(counter);
+        return getTurn(board.getCounter());
     }
 
     public static int getTurn(int halfturn) {
         return halfturn / 2 + 1;
     }
 
-    public void setCounter(int count) {
-        this.counter = count;
-    }
-
     public boolean isWhite() {
-        return isWhite(counter);
+        return isWhite(board.getCounter());
     }
 
     public static boolean isWhite(int halfturn) {
@@ -60,7 +53,7 @@ public class PlayerMove {
     }
 
     public boolean isBlack() {
-        return isBlack(counter);
+        return isBlack(board.getCounter());
     }
 
     public static boolean isBlack(int halfturn) {
@@ -79,7 +72,6 @@ public class PlayerMove {
     private PlayerMove(Board board) {
         //inst = this;
         this.board = board;
-        this.counter = -1;
         this.setStatus(null);
         this.gameOver = false;
     }
@@ -151,9 +143,6 @@ public class PlayerMove {
      * 3.3.2 If either of these fails, continue prompting
      */
     public boolean RequestMove() throws EOFException {
-        // 0. Increment the half-turn counter
-        counter++;
-
         // 1. Clear en passant targets for this player
         board.clearPassant(getColor());
 
@@ -171,7 +160,7 @@ public class PlayerMove {
                 setStatus("DRAW! Checkmate is no longer possible.");
                 this.setGameOver();
                 return false;
-            } else if (movesSinceCap >= 50) {
+            } else if (board.getMovesSinceCap() >= 50) {
                 setStatus("It has been 50 moves since the last capture or pawn advancement. The game ends in a draw");
                 this.setGameOver();
                 return false;
@@ -182,7 +171,7 @@ public class PlayerMove {
         do {
             // 3.1 Request user input
             System.out.println("\n" + getColorName() + " to move");
-            String input = IOUtils.promptForString(getTurn() + (isWhite() ? ". " : "... "));
+            String input = IOUtils.promptForString(getTurn() + (isWhite() ? ". " : "... ")).toLowerCase();
             // 3.2 Check whether it's a predefined command
             switch (input) {
                 case "exit":
@@ -203,6 +192,9 @@ public class PlayerMove {
                     helpMenu();
                     continue; // skips rest of loop and asks again for a move
                     // 3.2.2 Continue if it wasn't a forfeit
+                case "fen":
+                    System.out.println(board.toFEN());
+                    continue;
                 default:
                     break; // carries on with loop
             }
@@ -222,7 +214,11 @@ public class PlayerMove {
                 }
 
                 // 3.3.1 If successful, attempt to apply the resultant move
-                if (AttemptMove(move, board, getColor())) return true; // exits the method, indicating a successful move
+                if (AttemptMove(move, board, getColor())) {
+                    // 0. Increment the half-turn counter
+                    board.incrCounter();
+                    return true; // exits the method, indicating a successful move
+                }
                 else {
                     this.setStatusIfEmpty("Illegal move");
                     this.flushStatus();

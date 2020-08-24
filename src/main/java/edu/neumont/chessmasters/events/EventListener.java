@@ -66,9 +66,9 @@ public class EventListener {
         }
 
         if (event.getPiece() instanceof Pawn)
-            ChessMasters.controller.movesSinceCap = 0;
+            event.getBoard().setMovesSinceCap(0);
         else
-            ChessMasters.controller.movesSinceCap++;
+            event.getBoard().incrMovesSinceCap();
     }
 
     @EventHandler
@@ -86,7 +86,7 @@ public class EventListener {
         if (!(target instanceof PassantTarget))
             ChessMasters.controller.setStatus("The " + target.getColor().toString().toLowerCase() + " " + target.getName().toLowerCase() +
                     " was captured by the " + attacker.getColor().toString().toLowerCase() + " " + attacker.getName().toLowerCase() + extra + status);
-        ChessMasters.controller.movesSinceCap = 0;
+        event.getBoard().setMovesSinceCap(0);
     }
 
     private void runCastleCheck(PrePieceMoveEvent event, Board tempBoard, King king) {
