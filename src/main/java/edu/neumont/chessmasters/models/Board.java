@@ -241,6 +241,33 @@ public class Board {
 		return true;
 	}
 
+	public boolean checkStalemate(PieceColor color) {
+		return getAllPieces(color).stream().noneMatch(this::canPieceMove);
+	}
+
+	public boolean canPieceMove(Piece p) {
+		if (p == null) return false;
+		Location from = p.getLocation();
+
+		for (int rank_to = 0; rank_to < 8; rank_to++) {
+			for (int file_to = 0; file_to < 8; file_to++) {
+
+				Location to = new Location(file_to, rank_to);
+				if (from.equals(to)) continue;
+
+				Board b = new Board(this, true);
+				try {
+					if (b.movePiece(from, to) && !b.isInCheck(p.getColor()))
+						// we found a move that's valid and removes us from check
+						return true; // so we're not in checkmate
+				} catch (UnsupportedOperationException uoe) {
+					continue;
+				}
+			}
+		}
+		return false;
+	}
+
 	public boolean movePiece(String from, String to) {
 		return movePiece(new Location(from), new Location(to));
 	}
@@ -252,7 +279,10 @@ public class Board {
 	public boolean movePiece(Location from, Location to) {
 		Piece p = getSquare(from);
 		Piece target = getSquare(to);
-		if (p == null) return false;
+		if (p == null) {
+			ChessMasters.controller.setStatus("The source square (" + from.toString() + ") is empty");
+			return false;
+		}
 		if (!validateMove(p, to)) return false;
 		if (isCastle(new Move(from, to))) {
 			boolean castled = castle((King) p, (Rook) target);
