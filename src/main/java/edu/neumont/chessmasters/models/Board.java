@@ -6,7 +6,10 @@ import edu.neumont.chessmasters.events.EventRegistry;
 import edu.neumont.chessmasters.events.PieceCaptureEvent;
 import edu.neumont.chessmasters.events.PostPieceMoveEvent;
 import edu.neumont.chessmasters.models.pieces.*;
+import me.travja.utils.utils.IOUtils;
 
+import java.io.EOFException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Board {
@@ -54,6 +57,16 @@ public class Board {
 		movesSinceCap++;
 	}
 
+	private ArrayList<Move> moves;
+
+	public ArrayList<Move> getMoves() { return moves; }
+	public String getMoveHistory() {
+		StringBuilder out = new StringBuilder();
+		for (Move move : getMoves())
+			out.append(move.toString() + "\n");
+		return out.toString();
+	}
+
 	// Indicates whether to fire events. Ghost boards are used in determining checkmate,
 	// so we don't want to issue alerts of captures made on them.
 	public final boolean isGhostBoard;
@@ -89,35 +102,6 @@ public class Board {
 		return pieces;
 	}
 
-	/*
-	public Board(boolean withPawns) {
-		this.squares = new Piece[8][8];
-
-		if (withPawns)
-		for (int file = 0; file < 8; file++) {
-			placePiece(new Pawn(PieceColor.WHITE), new Location(file, 1));
-			placePiece(new Pawn(PieceColor.BLACK), new Location(file, 6));
-		}
-
-		placePiece(new   Rook(PieceColor.WHITE), new Location("a1"));
-		placePiece(new Knight(PieceColor.WHITE), new Location("b1"));
-		placePiece(new Bishop(PieceColor.WHITE), new Location("c1"));
-		placePiece(new  Queen(PieceColor.WHITE), new Location("d1"));
-		placePiece(new   King(PieceColor.WHITE), new Location("e1"));
-		placePiece(new Bishop(PieceColor.WHITE), new Location("f1"));
-		placePiece(new Knight(PieceColor.WHITE), new Location("g1"));
-		placePiece(new   Rook(PieceColor.WHITE), new Location("h1"));
-
-		placePiece(new   Rook(PieceColor.BLACK), new Location("a8"));
-		placePiece(new Knight(PieceColor.BLACK), new Location("b8"));
-		placePiece(new Bishop(PieceColor.BLACK), new Location("c8"));
-		placePiece(new  Queen(PieceColor.BLACK), new Location("d8"));
-		placePiece(new   King(PieceColor.BLACK), new Location("e8"));
-		placePiece(new Bishop(PieceColor.BLACK), new Location("f8"));
-		placePiece(new Knight(PieceColor.BLACK), new Location("g8"));
-		placePiece(new   Rook(PieceColor.BLACK), new Location("h8"));
-	}
-	*/
 
 	// copy ctors
 	public Board(Board original) {
@@ -126,6 +110,7 @@ public class Board {
 
 	public Board(Board original, boolean isGhost) {
 		this.squares = new Piece[8][8];
+		this.moves = (ArrayList<Move>)original.getMoves().clone();
 		this.isGhostBoard = isGhost;
 
 		// copy pieces over
@@ -147,6 +132,7 @@ public class Board {
 	// create board from FEN
 	public Board(String fen) {
 		this.squares = new Piece[8][8];
+		moves = new ArrayList<Move>();
 		this.isGhostBoard = false;
 
 		String[] components = fen.split(" ");
@@ -320,7 +306,10 @@ public class Board {
 		Piece victim = getSquare(dest);
 		if (victim != null) {
 			if (!p.validateCapture(dest) && !isGhostBoard) {
-				ChessMasters.controller.setStatus("You can't capture that piece.");
+				if (victim instanceof Rook && p instanceof King && p.getColor() == victim.getColor())
+					ChessMasters.controller.setStatus("That is an invalid castle.");
+				else
+					ChessMasters.controller.setStatus("You can't capture that piece.");
 				return false;
 			}
 			// if we are, ensure that we're capturing an opponent
@@ -500,9 +489,43 @@ public class Board {
 			setSquare(to, p);
 			setSquare(from, null);
 
-			if (p instanceof Pawn && ((Pawn) p).shouldPromote()) { //Promote pawn to queen.
-				p = new Queen(p.getColor());
-				setSquare(to, p);
+			if (!isGhostBoard && p instanceof Pawn && ((Pawn) p).shouldPromote()) { // Promote pawn to queen.
+				String choiceInput = "";
+				boolean validInput = false;
+				do {
+					try {
+						choiceInput = IOUtils.promptForString("What would you like to promote your piece to (Queen, Knight, Rook, or Bishop)?: ").toLowerCase();
+					} catch (EOFException e) {
+						e.printStackTrace();
+					}
+
+					choiceInput.toLowerCase();
+					switch(choiceInput) {
+						case "queen" :
+							p = new Queen(p.getColor());
+							setSquare(to, p);
+							validInput = true;
+							break;
+						case "knight" :
+							p = new Knight(p.getColor());
+							setSquare(to, p);
+							validInput = true;
+							break;
+						case "rook" :
+							p = new Rook(p.getColor());
+							setSquare(to, p);
+							validInput = true;
+							break;
+						case "bishop" :
+							p = new Bishop(p.getColor());
+							setSquare(to, p);
+							validInput = true;
+							break;
+						default:
+							System.out.println("Invalid piece.");
+							break;
+					}
+				} while(!validInput);
 			}
 
 			if (!this.isGhostBoard) {
@@ -514,6 +537,9 @@ public class Board {
 				}
 			}
 		}
+
+		// if we made it this far, the move is ok
+		moves.add(new Move(from, to));
 		return true;
 	}
 
@@ -628,7 +654,10 @@ public class Board {
 
 	@Override
 	public String toString() {
+		return this.toString(PieceColor.WHITE, false);
+	}
 
+	public String toString(PieceColor side, boolean highlightLast) {
 		// Build the top edge
 		String top = Utils.buildRow(
 				"   " + Utils.Drawing.Corners.topLeft(),
@@ -660,20 +689,35 @@ public class Board {
 		StringBuilder sb_out = new StringBuilder();
 
 		String prefix = top;
-		int rankIndex = 8;
 
 		boolean squareColor = true; // white, starting at a8
 
 		// Build each row
 		for (int row = 7; row >= 0; row--) {
-			Piece[] rank = squares[row];
+			Piece[] rank = squares[side == PieceColor.WHITE ? row : 7 - row];
 			sb_out.append(prefix);
 
-			sb_out.append(' ').append(rankIndex--).append(' ');
-			for (Piece piece : rank) {
+			sb_out.append(' ').append(side == PieceColor.WHITE ? row + 1 : 8 - row).append(' ');
+			for (int col = 0; col < 8; col++) {
+				Piece piece = rank[side == PieceColor.WHITE ? col : 7 - col];
+				sb_out.append(Utils.Drawing.Edges.vertical());
+
+				// highlight last move if applicable
+				if (highlightLast && getMoves().size() > 0) {
+					Location thisSquare = (side == PieceColor.WHITE ? new Location(col, row) : new Location(7-col, 7-row));
+					Move lastMove = getMoves().get(getMoves().size()-1);
+					if (thisSquare.equals(lastMove.from)) {
+						sb_out.append(Utils.Styles.sourceSquare());
+					} else if (thisSquare.equals(lastMove.to)) {
+						sb_out.append(Utils.Styles.destSquare());
+					} else {
+						sb_out.append(squareColor ? Utils.Styles.lightSquare() : Utils.Styles.darkSquare());
+					}
+				} else {
+					sb_out.append(squareColor ? Utils.Styles.lightSquare() : Utils.Styles.darkSquare());
+				}
+
 				sb_out
-					.append(Utils.Drawing.Edges.vertical())
-					.append(squareColor ? Utils.Styles.lightSquare() : Utils.Styles.darkSquare())
 					.append(' ')
 					.append(piece == null ? '-' : piece)
 					.append(' ')
@@ -692,7 +736,10 @@ public class Board {
 		}
 
 		sb_out.append(bottom);
-		sb_out.append("     a   b   c   d   e   f   g   h  ");
+		if (side == PieceColor.WHITE)
+			sb_out.append("     a   b   c   d   e   f   g   h  ");
+		else
+			sb_out.append("     h   g   f   e   d   c   b   a  ");
 
 		return sb_out.toString();
 	}

@@ -10,6 +10,8 @@ public class GameSettings {
 	//public ColorSelection color = ColorSelection.AUTO;
 	public Boolean color = null;
 	public Boolean unicode = null;
+	public Boolean traceMoves = false;
+	public boolean flip = false;
 	public String filePath;
 	public String fileContents;
 	public String[] raw;

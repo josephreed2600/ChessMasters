@@ -42,10 +42,34 @@ public class ChessMasters {
 			"Options:\n"+
 				"\t-h  --help              \tDisplay this help and exit\n" +
 				"\t-c  --color   <tristate>\tConfigure color support\n" +
-				"\t-u  --unicode <tristate>\tonfigure unicode support\n" +
+				"\t-u  --unicode <tristate>\tConfigure unicode support\n" +
+				"\t-t  --trace   <tristate>\tConfigure tracing the last move made (requires color)\n" +
+				"\t-f  --flip    <tristate>\tConfigure flipping the board to face the player\n" +
 				"\t-d  --debug             \tEnable debug mode\n" +
 				"\n" +
 				"\t<tristate>\tOne of { yes | no | on | off | 1 | 0 | true | false | enable | disable | auto }\n";
+
+		public static Boolean parseTristate(List<String> argv, String option) {
+			if (argv.size() < 1) {
+				System.err.println(
+						"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
+				return null;
+			}
+			String input = argv.remove(0);
+			switch (input) {
+				case "true":  case "yes": case "on":  case "1": case "enable":
+					return true;
+				case "false": case "no":  case "off": case "0": case "disable":
+					return false;
+				case "auto":
+					return null;
+				default:
+					System.err.println(
+							"[ warn ] Option " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + input
+							+ ". Ignoring");
+					return null;
+			}
+		}
 
 		public static GameSettings parseArgs(String[] args) {
 			GameSettings options = new GameSettings(args);
@@ -81,65 +105,38 @@ public class ChessMasters {
 
 					case "-c":
 					case "--color":
-						if (argv.size() < 1) {
-							System.err.println(
-									"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
-							break;
-						}
-						String colorSetting = argv.remove(0);
-						switch (colorSetting) {
-							case "true":  case "yes": case "on":  case "1": case "enable":
-								options.color = true;
-								break;
-							case "false": case "no":  case "off": case "0": case "disable":
-								options.color = false;
-								break;
-							case "auto":
-								options.color = null;
-								break;
-							default:
-								System.err.println(
-										"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + colorSetting
-										+ ". Ignoring");
-						}
+						options.color = parseTristate(argv, option);
 						break;
 
 					case "-u":
 					case "--unicode":
-						if (argv.size() < 1) {
-							System.err.println(
-									"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received nothing. Ignoring");
-							break;
-						}
-						String unicodeSetting = argv.remove(0);
-						switch (unicodeSetting) {
-							case "true":  case "yes": case "on":  case "1": case "enable":
-								options.unicode = true;
-								break;
-							case "false": case "no":  case "off": case "0": case "disable":
-								options.unicode = false;
-								break;
-							case "auto":
-								options.unicode = null;
-								break;
-							default:
-								System.err.println(
-										"[ warn ]\tOption " + option + " expects one of {true|yes|on|1|enable}|{false|no|off|0|disable}|auto; received " + unicodeSetting
-										+ ". Ignoring");
-						}
+						options.unicode = parseTristate(argv, option);
 						break;
 
+					case "-t":
+					case "--trace":
+						options.traceMoves = parseTristate(argv, option);
+						break;
+
+					case "-f":
+					case "--flip":
+						Boolean temp = parseTristate(argv, option);
+						if (temp != null) options.flip = temp;
+						break;
+
+						/*
 					case "--file":
 					case "-f":
 						// handle files here
 						if (argv.size() < 1) {
-							System.err.println("[ warn ]\tOption " + option + " expects a file path; received nothing. Ignoring");
+							System.err.println("[ warn ] Option " + option + " expects a file path; received nothing. Ignoring");
 							break;
 						}
 						options.filePath = argv.remove(0);
 						options.fileContents = FileUtils.readFileFully(options.filePath);
 						System.err.println("Found file contents:\n" + options.fileContents);
 						break;
+						*/
 
 					default:
 						// ignore unknown options
@@ -174,8 +171,9 @@ public class ChessMasters {
                     "Chances are, you know what you're doing, but if you accessed the application in a normal way, please let the developers know that you're receiving this error.\n");
         }
 
-				if(options.color   != null) Utils.USE_ANSI    = options.color;
-				if(options.unicode != null) Utils.USE_UNICODE = options.unicode;
+				if(options.color      != null) Utils.USE_ANSI     = options.color;
+				if(options.unicode    != null) Utils.USE_UNICODE  = options.unicode;
+				if(options.traceMoves == null) options.traceMoves = Utils.USE_ANSI; // by default, trace moves if color is allowed
 
         try {
             do {
@@ -183,6 +181,8 @@ public class ChessMasters {
 //                Board board = new Board("r2qk2r/8/8/8/8/8/8/R2QK2R w KQkq - 0 1");
                 controller = PlayerMove.inst(new Board());
                 controller.run(options);
+                if (IOUtils.promptForBoolean("Dump move log? (y/n)", "y", "n"))
+									controller.dumpMoveLog();
                 playAgain = IOUtils.promptForBoolean("Play again? (y/n)", "y", "n");
             } while (playAgain);
         } catch (EOFException e) {

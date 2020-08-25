@@ -14,8 +14,8 @@ public class PlayerMove {
 
     private        Board        board;
     private static PlayerMove   inst;
-    private        String       status        = null;
-    private        boolean      gameOver      = false;
+    private        String       status   = null;
+    private        boolean      gameOver = false;
     private        GameSettings options;
     public         String       positionOne;
     public         String       positionTwo;
@@ -96,8 +96,9 @@ public class PlayerMove {
         boolean keepPlaying;
         do {
             keepPlaying = RequestMove();
-            this.flushStatus();
             if (this.gameOver) {
+                this.flushStatus();
+                System.out.println("\n" + board.toString(PieceColor.WHITE, options.traceMoves) + "\n");
                 return;
             }
         } while (keepPlaying);
@@ -184,17 +185,21 @@ public class PlayerMove {
                     this.setGameOver();
                     return false; // exits method, indicating game is over
                 case "board":
-                    System.out.println("\n\n" + board + "\n");
+                    System.out.println("\n\n" + board.toString(options.flip ? getColor() : PieceColor.WHITE, options.traceMoves));
                     continue; // skips rest of loop and asks again for a move
+                case "moves":
+                case "history":
+                case "dump":
+                    dumpMoveLog();
+                    continue;
                 case "help":
                 case "?":
-                    // 3.2.1 Execute command
                     helpMenu();
                     continue; // skips rest of loop and asks again for a move
-                    // 3.2.2 Continue if it wasn't a forfeit
                 case "fen":
                     System.out.println(board.toFEN());
                     continue;
+                    // 3.2.2 Continue if it wasn't a forfeit
                 default:
                     break; // carries on with loop
             }
@@ -218,8 +223,7 @@ public class PlayerMove {
                     // 0. Increment the half-turn counter
                     board.incrCounter();
                     return true; // exits the method, indicating a successful move
-                }
-                else {
+                } else {
                     this.setStatusIfEmpty("Illegal move");
                     this.flushStatus();
 
@@ -241,108 +245,6 @@ public class PlayerMove {
         //throw new IllegalStateException("We escaped a do-while(true) in PlayerMove");
     }
 
-		/*
-    //Returns a boolean dependent on if the player intends to quit the game or not.
-    public boolean MenuPrompt() throws EOFException {
-        PieceColor current = counter % 2 == 0 ? PieceColor.WHITE : PieceColor.BLACK;
-        board.clearPassant(current);
-        System.out.println("\n\n" + board);
-        boolean movePieceCheck;
-        MoveResult result = null;
-        do {
-            if (!gameOver) {
-                boolean stalemate = board.checkStalemate(current);
-                if (stalemate) {
-                    setStatus(current + ", you have been forced into a STALEMATE! " + current.getOpposite() + ", I guess this sort of means you win.");
-                    gameOver = true;
-                } else if (board.isDeadPosition()) {
-                    setStatus("DRAW! Checkmate is no longer possible.");
-                    gameOver = true;
-                } else if (movesSinceCap >= 50) {
-                    setStatus("It has been 50 moves since the last capture. The game ends in a draw");
-                    gameOver = true;
-                }
-            }
-
-            if (status != null) {
-                System.out.println(status);
-                setStatus(null);
-            }
-            if (gameOver)
-                return false;
-
-            StringBuilder sb = new StringBuilder();
-            if (counter == 0)
-                sb.append("Welcome to Chess Masters");
-            sb.append("\n\n");
-
-            System.out.println(sb);
-            String input = null;
-            boolean isInt = false;
-
-
-            do {
-
-                positionOne = null;
-                positionTwo = null;
-                if (input != null && !input.equalsIgnoreCase("board"))
-                    System.out.println("Unrecognized command. Type 'help' for help.");
-                input = IOUtils.promptForString((counter % 2 == 0 ? "White" : "Black") + ", it's your turn:\nEnter a choice: ").toLowerCase();
-                movePieceCheck = Pattern.matches("[A-Ha-h][1-8][\\s][A-Ha-h][1-8]", input);
-
-                if (movePieceCheck) {
-                    String[] text = input.split(Pattern.quote(" "));
-                    positionOne = text[0];
-                    positionTwo = text[1];
-
-                    input = "1";
-
-                } else if (input.equals("help")) {
-                    input = "2";
-                } else if (input.equals("board")) {
-                    System.out.println("\n\n" + board);
-                    continue;
-                }
-
-
-                try {
-                    Integer.parseInt(input);
-                    isInt = true;
-                } catch (NumberFormatException e) {
-                    isInt = false;
-                }
-            } while (!isInt && !input.equalsIgnoreCase("quit"));
-
-
-            boolean check = input.equalsIgnoreCase("quit");
-
-            if (!check) {
-
-                switch (Integer.parseInt(input)) {
-                    case 1:
-                        result = (positionOne == null || positionTwo == null) ? MoveResult.FAILED : PromptMove();
-                        if (result == MoveResult.FAILED) {
-                            if (status == null)
-                                setStatus("That move could not be performed.");
-                        } else {
-                            counter++;
-                        }
-
-
-                        break;
-                    case 2:
-                        helpMenu();
-                        break;
-                    case 3:
-                        return false;
-                }
-                return true;
-            }
-        } while (result == MoveResult.FAILED);
-        return false;
-    }
-*/
-
     // true for success, false for failure
     // 0. Ensure that the source square has a piece
     // 1. Ensure that the piece to move is of the correct color
@@ -363,71 +265,7 @@ public class PlayerMove {
         return board.movePiece(move);
     }
 
-// ensure that a piece exists in the source square
-// ensure that piece is of correct color
-// attempt to move the piece
-/*
-	public MoveResult PromptMove() {
-		MoveResult result = MoveResult.FAILED;
-		boolean checkPiece = true;
-		boolean checkSecond = true;
-		checkPiece = CheckMove(positionOne);
-		if (checkPiece) {
-			Piece p = board.getSquare(positionOne);
-			if (p == null) {
-				checkPiece = false;
-				setStatus("no piece here");
-				return MoveResult.FAILED;
-			} else {
-				PieceColor colorPiece = p.getColor();
-				if (counter % 2 == 0) {
-					if (colorPiece != PieceColor.WHITE) {
-						checkPiece = false;
-						setStatus("wrong piece color");
-						return MoveResult.FAILED;
-					}
-				} else {
-					if (colorPiece != PieceColor.BLACK) {
-						checkPiece = false;
-						setStatus("wrong piece color");
-						return MoveResult.FAILED;
-					}
-				}
-			}
-		}
-		checkSecond = CheckMove(positionTwo);
-		if (!checkSecond) {
-			setStatus("You have chosen an incorrect location "); // ????
-			return MoveResult.FAILED;
-		}
-		if (result != MoveResult.QUIT) {
-			boolean c = board.movePiece(positionOne, positionTwo);
-			result = c ? MoveResult.MOVED : MoveResult.FAILED;
-		}
-		return result;
-	}
-	*/
-
-/*
-    private boolean CheckMove(String po1) {
-        boolean checkerOne = Pattern.matches("[A-Ha-h][1-8]", po1);
-        return checkerOne;
-    }
-
-    private boolean QuitGame(String s) {
-        String quit = "quit";
-
-        if (s.equals(quit)) {
-            System.out.println("You have chosen to forfeit the game");
-            return true;
-//            System.exit(0);
-        }
-
-        return false;
-    }
-		*/
-
-    private void helpMenu() throws EOFException {
+    private void helpMenu() {
         StringBuilder helper = new StringBuilder(" --[ Helper commands ]-- ");
 
         helper.append("\n\nTo move, simply input your target piece (a2) and your destination (a4). Ex: 'a2 a4' moves the piece at a2 to a4")
@@ -439,13 +277,8 @@ public class PlayerMove {
         this.flushStatus();
     }
 
-
-		/*
-    public enum MoveResult {
-        QUIT,
-        MOVED,
-        FAILED
+    public void dumpMoveLog() {
+        System.out.println("\nMove history:\n\n" + board.getMoveHistory() + "\n");
     }
-		*/
 
 }
