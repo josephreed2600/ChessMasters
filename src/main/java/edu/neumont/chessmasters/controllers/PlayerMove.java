@@ -143,7 +143,7 @@ public class PlayerMove {
 						this.setGameOver();
 						return false; // exits method, indicating game is over
 					case "board":
-						System.out.println("\n\n" + board + "\n");
+						System.out.println("\n\n" + board.toString(options.flip ? getColor() : PieceColor.WHITE, options.traceMoves));
 						continue; // skips rest of loop and asks again for a move
 					case "moves":
 					case "history":
