@@ -11,7 +11,7 @@ public class GameSettings {
 	public Boolean color = null;
 	public Boolean unicode = null;
 	public Boolean traceMoves = null;
-	public boolean flip = true;
+	public boolean flip = false;
 	public String filePath;
 	public String fileContents;
 	public String[] raw;
