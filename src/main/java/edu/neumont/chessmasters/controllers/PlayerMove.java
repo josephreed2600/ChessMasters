@@ -148,7 +148,7 @@ public class PlayerMove {
         board.clearPassant(getColor());
 
         // 2. Print board
-        System.out.println("\n\n" + board);
+        System.out.println("\n\n" + board.toString(options.flip ? getColor() : PieceColor.WHITE, options.traceMoves));
         // 2.1 End-game logic, assuming we have not already reached end-game
         if (!gameOver) {
             // 2.1.1 If we're in a stalemate, say so and end the game
