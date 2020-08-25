@@ -8,6 +8,7 @@ import edu.neumont.chessmasters.events.PostPieceMoveEvent;
 import edu.neumont.chessmasters.models.pieces.*;
 import me.travja.utils.utils.IOUtils;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -308,14 +309,14 @@ public class Board {
 			setSquare(to, p);
 			setSquare(from, null);
 
-			if (p instanceof Pawn && ((Pawn) p).shouldPromote()) { // Promote pawn to queen.
+			if (!isGhostBoard && p instanceof Pawn && ((Pawn) p).shouldPromote()) { // Promote pawn to queen.
 				String choiceInput = "";
 				boolean validInput = false;
-				while(validInput == false) {
+				do {
 					try {
-						choiceInput = IOUtils.promptForString("What would you like to promote your piece to(Queen, Knight, Rook, or Bishop)?: ");
-					} catch (IOException e) {
-						System.out.println("Invalid input.");
+						choiceInput = IOUtils.promptForString("What would you like to promote your piece to (Queen, Knight, Rook, or Bishop)?: ").toLowerCase();
+					} catch (EOFException e) {
+						e.printStackTrace();
 					}
 
 					choiceInput.toLowerCase();
@@ -324,22 +325,27 @@ public class Board {
 							p = new Queen(p.getColor());
 							setSquare(to, p);
 							validInput = true;
+							break;
 						case "knight" :
 							p = new Knight(p.getColor());
 							setSquare(to, p);
 							validInput = true;
+							break;
 						case "rook" :
 							p = new Rook(p.getColor());
 							setSquare(to, p);
 							validInput = true;
+							break;
 						case "bishop" :
 							p = new Bishop(p.getColor());
 							setSquare(to, p);
 							validInput = true;
+							break;
 						default:
 							System.out.println("Invalid piece.");
+							break;
 					}
-				}
+				} while(!validInput);
 			}
 
 			if (!this.isGhostBoard) {
