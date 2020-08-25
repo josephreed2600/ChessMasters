@@ -6,7 +6,9 @@ import edu.neumont.chessmasters.events.EventRegistry;
 import edu.neumont.chessmasters.events.PieceCaptureEvent;
 import edu.neumont.chessmasters.events.PostPieceMoveEvent;
 import edu.neumont.chessmasters.models.pieces.*;
+import me.travja.utils.utils.IOUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Board {
@@ -308,7 +310,7 @@ public class Board {
 
 			if (p instanceof Pawn && ((Pawn) p).shouldPromote()) { // Promote pawn to queen.
 				String choiceInput = "";
-				validInput = false;
+				boolean validInput = false;
 				while(validInput == false) {
 					try {
 						choiceInput = IOUtils.promptForString("What would you like to promote your piece to(Queen, Knight, Rook, or Bishop)?: ");
