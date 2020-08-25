@@ -12,7 +12,7 @@ class PieceMovementTests {
 
     @BeforeAll
     public static void setup() {
-        PlayerMove controller = new PlayerMove();
+        PlayerMove controller = PlayerMove.inst();
         ChessMasters.controller = controller;
     }
 

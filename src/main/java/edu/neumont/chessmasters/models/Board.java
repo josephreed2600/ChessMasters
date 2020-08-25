@@ -27,6 +27,16 @@ public class Board {
 		if (p != null) p.setLocation(l);
 	}
 
+	private ArrayList<Move> moves;
+
+	public ArrayList<Move> getMoves() { return moves; }
+	public String getMoveHistory() {
+		StringBuilder out = new StringBuilder();
+		for (Move move : getMoves())
+			out.append(move.toString() + "\n");
+		return out.toString();
+	}
+
 	// Indicates whether to fire events. Ghost boards are used in determining checkmate,
 	// so we don't want to issue alerts of captures made on them.
 	public final boolean isGhostBoard;
@@ -62,35 +72,6 @@ public class Board {
 		return pieces;
 	}
 
-	/*
-	public Board(boolean withPawns) {
-		this.squares = new Piece[8][8];
-
-		if (withPawns)
-		for (int file = 0; file < 8; file++) {
-			placePiece(new Pawn(PieceColor.WHITE), new Location(file, 1));
-			placePiece(new Pawn(PieceColor.BLACK), new Location(file, 6));
-		}
-
-		placePiece(new   Rook(PieceColor.WHITE), new Location("a1"));
-		placePiece(new Knight(PieceColor.WHITE), new Location("b1"));
-		placePiece(new Bishop(PieceColor.WHITE), new Location("c1"));
-		placePiece(new  Queen(PieceColor.WHITE), new Location("d1"));
-		placePiece(new   King(PieceColor.WHITE), new Location("e1"));
-		placePiece(new Bishop(PieceColor.WHITE), new Location("f1"));
-		placePiece(new Knight(PieceColor.WHITE), new Location("g1"));
-		placePiece(new   Rook(PieceColor.WHITE), new Location("h1"));
-
-		placePiece(new   Rook(PieceColor.BLACK), new Location("a8"));
-		placePiece(new Knight(PieceColor.BLACK), new Location("b8"));
-		placePiece(new Bishop(PieceColor.BLACK), new Location("c8"));
-		placePiece(new  Queen(PieceColor.BLACK), new Location("d8"));
-		placePiece(new   King(PieceColor.BLACK), new Location("e8"));
-		placePiece(new Bishop(PieceColor.BLACK), new Location("f8"));
-		placePiece(new Knight(PieceColor.BLACK), new Location("g8"));
-		placePiece(new   Rook(PieceColor.BLACK), new Location("h8"));
-	}
-	*/
 
 	// copy ctors
 	public Board(Board original) {
@@ -99,6 +80,7 @@ public class Board {
 
 	public Board(Board original, boolean isGhost) {
 		this.squares = new Piece[8][8];
+		this.moves = (ArrayList<Move>)original.getMoves().clone();
 		this.isGhostBoard = isGhost;
 
 		// copy pieces over
@@ -120,6 +102,7 @@ public class Board {
 	// create board from FEN
 	public Board(String fen) {
 		this.squares = new Piece[8][8];
+		moves = new ArrayList<Move>();
 		this.isGhostBoard = false;
 
 		String[] components = fen.split(" ");
@@ -241,6 +224,33 @@ public class Board {
 		return true;
 	}
 
+	public boolean checkStalemate(PieceColor color) {
+		return getAllPieces(color).stream().noneMatch(this::canPieceMove);
+	}
+
+	public boolean canPieceMove(Piece p) {
+		if (p == null) return false;
+		Location from = p.getLocation();
+
+		for (int rank_to = 0; rank_to < 8; rank_to++) {
+			for (int file_to = 0; file_to < 8; file_to++) {
+
+				Location to = new Location(file_to, rank_to);
+				if (from.equals(to)) continue;
+
+				Board b = new Board(this, true);
+				try {
+					if (b.movePiece(from, to) && !b.isInCheck(p.getColor()))
+						// we found a move that's valid and removes us from check
+						return true; // so we're not in checkmate
+				} catch (UnsupportedOperationException uoe) {
+					continue;
+				}
+			}
+		}
+		return false;
+	}
+
 	public boolean movePiece(String from, String to) {
 		return movePiece(new Location(from), new Location(to));
 	}
@@ -252,7 +262,10 @@ public class Board {
 	public boolean movePiece(Location from, Location to) {
 		Piece p = getSquare(from);
 		Piece target = getSquare(to);
-		if (p == null) return false;
+		if (p == null) {
+			ChessMasters.controller.setStatus("The source square (" + from.toString() + ") is empty");
+			return false;
+		}
 		if (!validateMove(p, to)) return false;
 		if (isCastle(new Move(from, to))) {
 			boolean castled = castle((King) p, (Rook) target);
@@ -332,6 +345,9 @@ public class Board {
 				EventRegistry.callEvents(post);
 			}
 		}
+
+		// if we made it this far, the move is ok
+		moves.add(new Move(from, to));
 		return true;
 	}
 
@@ -444,7 +460,10 @@ public class Board {
 
 	@Override
 	public String toString() {
+		return this.toString(PieceColor.WHITE, false);
+	}
 
+	public String toString(PieceColor side, boolean highlightLast) {
 		// Build the top edge
 		String top = Utils.buildRow(
 				"   " + Utils.Drawing.Corners.topLeft(),
@@ -476,20 +495,35 @@ public class Board {
 		StringBuilder sb_out = new StringBuilder();
 
 		String prefix = top;
-		int rankIndex = 8;
 
 		boolean squareColor = true; // white, starting at a8
 
 		// Build each row
 		for (int row = 7; row >= 0; row--) {
-			Piece[] rank = squares[row];
+			Piece[] rank = squares[side == PieceColor.WHITE ? row : 7 - row];
 			sb_out.append(prefix);
 
-			sb_out.append(' ').append(rankIndex--).append(' ');
-			for (Piece piece : rank) {
+			sb_out.append(' ').append(side == PieceColor.WHITE ? row + 1 : 8 - row).append(' ');
+			for (int col = 0; col < 8; col++) {
+				Piece piece = rank[side == PieceColor.WHITE ? col : 7 - col];
+				sb_out.append(Utils.Drawing.Edges.vertical());
+
+				// highlight last move if applicable
+				if (highlightLast && getMoves().size() > 0) {
+					Location thisSquare = (side == PieceColor.WHITE ? new Location(col, row) : new Location(7-col, 7-row));
+					Move lastMove = getMoves().get(getMoves().size()-1);
+					if (thisSquare.equals(lastMove.from)) {
+						sb_out.append(Utils.Styles.sourceSquare());
+					} else if (thisSquare.equals(lastMove.to)) {
+						sb_out.append(Utils.Styles.destSquare());
+					} else {
+						sb_out.append(squareColor ? Utils.Styles.lightSquare() : Utils.Styles.darkSquare());
+					}
+				} else {
+					sb_out.append(squareColor ? Utils.Styles.lightSquare() : Utils.Styles.darkSquare());
+				}
+
 				sb_out
-					.append(Utils.Drawing.Edges.vertical())
-					.append(squareColor ? Utils.Styles.lightSquare() : Utils.Styles.darkSquare())
 					.append(' ')
 					.append(piece == null ? '-' : piece)
 					.append(' ')
@@ -508,7 +542,10 @@ public class Board {
 		}
 
 		sb_out.append(bottom);
-		sb_out.append("     a   b   c   d   e   f   g   h  ");
+		if (side == PieceColor.WHITE)
+			sb_out.append("     a   b   c   d   e   f   g   h  ");
+		else
+			sb_out.append("     h   g   f   e   d   c   b   a  ");
 
 		return sb_out.toString();
 	}
