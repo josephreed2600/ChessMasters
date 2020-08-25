@@ -70,8 +70,8 @@ public class PlayerMove {
         boolean keepPlaying;
         do {
             keepPlaying = RequestMove();
-						this.flushStatus();
 						if (this.gameOver) {
+							this.flushStatus();
 							System.out.println("\n" + board.toString(PieceColor.WHITE, options.traceMoves) + "\n");
 							return;
 						}
@@ -117,6 +117,7 @@ public class PlayerMove {
 
 		 // 2. Print board
 			System.out.println("\n\n" + board.toString(options.flip ? getColor() : PieceColor.WHITE, options.traceMoves));
+			this.flushStatus(); //And flush the status
 
 		 // 2.1 If we're in a stalemate, say so and end the game
 			if (!gameOver && board.checkStalemate(getColor())) {
