@@ -160,6 +160,12 @@ public class ChessMasters {
         }
     }
 
+    public static void loadSettings(GameSettings options) {
+		if (options.color != null) Utils.USE_ANSI = options.color;
+		if (options.unicode != null) Utils.USE_UNICODE = options.unicode;
+		if (options.traceMoves == null) options.traceMoves = Utils.USE_ANSI; // by default, trace moves if color is allowed
+	}
+
     public static void startGame(GameSettings options) {
         boolean playAgain;
 
@@ -171,9 +177,7 @@ public class ChessMasters {
                     "Chances are, you know what you're doing, but if you accessed the application in a normal way, please let the developers know that you're receiving this error.\n");
         }
 
-				if(options.color      != null) Utils.USE_ANSI     = options.color;
-				if(options.unicode    != null) Utils.USE_UNICODE  = options.unicode;
-				if(options.traceMoves == null) options.traceMoves = Utils.USE_ANSI; // by default, trace moves if color is allowed
+		loadSettings(options);
 
         try {
             do {

@@ -1,14 +1,19 @@
 package edu.neumont.chessmasters.controllers;
 
+import edu.neumont.chessmasters.ChessMasters;
 import edu.neumont.chessmasters.exceptions.IncompleteMoveException;
 import edu.neumont.chessmasters.models.Board;
 import edu.neumont.chessmasters.models.GameSettings;
 import edu.neumont.chessmasters.models.Move;
 import edu.neumont.chessmasters.models.pieces.Piece;
 import edu.neumont.chessmasters.models.pieces.PieceColor;
+import me.travja.utils.menu.Menu;
+import me.travja.utils.menu.MenuOption;
 import me.travja.utils.utils.IOUtils;
 
 import java.io.EOFException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class PlayerMove {
 
@@ -199,6 +204,9 @@ public class PlayerMove {
                 case "fen":
                     System.out.println(board.toFEN());
                     continue;
+                case "options":
+                    editOptions();
+                    continue;
                     // 3.2.2 Continue if it wasn't a forfeit
                 default:
                     break; // carries on with loop
@@ -279,6 +287,79 @@ public class PlayerMove {
 
     public void dumpMoveLog() {
         System.out.println("\nMove history:\n\n" + board.getMoveHistory() + "\n");
+    }
+
+    private void editOptions() {
+        MenuOption colors = new MenuOption("Colors: \t" + (getSettings().color != null ? getSettings().color : "auto"), () -> {
+            Boolean input;
+            try {
+                input = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Colors': "))), "color");
+                getSettings().color = input;
+                System.out.println("Setting updated to " + (input == null ? "auto" : input));
+            } catch (EOFException e) {
+                e.printStackTrace();
+            }
+        });
+        MenuOption unicode = new MenuOption("Unicode: \t" + (getSettings().unicode != null ? getSettings().unicode : "auto"), () -> {
+            Boolean input;
+            try {
+                input = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Unicode': "))), "unicode");
+                getSettings().unicode = input;
+                System.out.println("Setting updated to " + (input == null ? "auto" : input));
+            } catch (EOFException e) {
+                e.printStackTrace();
+            }
+        });
+        MenuOption trace = new MenuOption("Trace: \t" + (getSettings().traceMoves != null ? getSettings().traceMoves : "auto"), () -> {
+            Boolean input;
+            try {
+                input = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Trace': "))), "trace");
+                getSettings().traceMoves = input;
+                System.out.println("Setting updated to " + (input == null ? "auto" : input));
+            } catch (EOFException e) {
+                e.printStackTrace();
+            }
+        });
+        MenuOption flip = new MenuOption("Flip: \t" + getSettings().flip, () -> {
+            boolean input;
+            try {
+                Boolean temp = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Flip': "))), "flip");
+                input = temp != null ? temp : getSettings().flip;
+                getSettings().flip = input;
+                if (temp != null)
+                    System.out.println("Setting updated to " + input);
+                else
+                    System.out.println("Setting was not updated.");
+            } catch (EOFException e) {
+                e.printStackTrace();
+            }
+        });
+        MenuOption debug = new MenuOption("Debug: \t" + getSettings().debug, () -> {
+            boolean input;
+            try {
+                Boolean temp = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Debug': "))), "debug");
+                input = temp != null ? temp : getSettings().debug;
+                getSettings().debug = input;
+                if (temp != null)
+                    System.out.println("Setting updated to " + input);
+                else
+                    System.out.println("Setting was not updated.");
+            } catch (EOFException e) {
+                e.printStackTrace();
+            }
+        });
+
+        Menu menu = new Menu("What would you like to edit?", colors, unicode, trace, flip, debug)
+                .setPerpetual(() -> {
+                    colors.setOption("Colors: \t" + (getSettings().color != null ? getSettings().color : "auto"));
+                    unicode.setOption("Unicode: \t" + (getSettings().unicode != null ? getSettings().unicode : "auto"));
+                    trace.setOption("Trace: \t" + (getSettings().traceMoves != null ? getSettings().traceMoves : "auto"));
+                    flip.setOption("Flip: \t" + getSettings().flip);
+                    debug.setOption("Debug: \t" + getSettings().debug);
+
+                    ChessMasters.loadSettings(getSettings());
+                });
+        menu.open(true);
     }
 
 }
