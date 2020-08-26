@@ -164,7 +164,10 @@ public class Board {
 		Piece victim = getSquare(dest);
 		if (victim != null) {
 			if (!p.validateCapture(dest) && !isGhostBoard) {
-				ChessMasters.controller.setStatus("You can't capture that piece.");
+				if (victim instanceof Rook && p instanceof King && p.getColor() == victim.getColor())
+					ChessMasters.controller.setStatus("That is an invalid castle.");
+				else
+					ChessMasters.controller.setStatus("You can't capture that piece.");
 				return false;
 			}
 			// if we are, ensure that we're capturing an opponent
