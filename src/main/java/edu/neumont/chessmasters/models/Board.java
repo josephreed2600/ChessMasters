@@ -197,7 +197,6 @@ public class Board {
 		try {
 			int count = Integer.parseInt(counter);
 			setCounter(((count-1) * 2 + (turn == PieceColor.WHITE ? 0 : 1))); //FEN counter strings start at 1, our counter starts at 0.
-			System.out.println("Counter set to " + getCounter());
 		} catch (NumberFormatException e) {
 			System.err.println("Could not set the move counter. '" + counter + "' is not a number. 1 will be used as default.");
 		}
