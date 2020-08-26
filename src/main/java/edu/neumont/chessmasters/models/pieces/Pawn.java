@@ -11,7 +11,6 @@ public class Pawn extends Piece {
     }
 
     public boolean shouldPromote() {
-        System.out.println(getLocation() + " " + getLocation().getY());
         return (color == PieceColor.WHITE && getLocation().getY() == 7) ||
                 (color == PieceColor.BLACK && getLocation().getY() == 0);
     }

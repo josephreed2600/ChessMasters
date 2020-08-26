@@ -72,6 +72,10 @@ public class Location {
         return out;
     }
 
+    public Location add(int x, int y) {
+        return new Location(getX() + x, getY() + y);
+    }
+
     @Override
     public String toString() {
         int rank = 1 + getY();

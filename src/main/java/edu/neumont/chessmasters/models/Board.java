@@ -16,6 +16,9 @@ public class Board {
 
 	// y, x
 	private Piece[][] squares;
+	// Half-turns, starting at 0. To get turn number, (counter/2) + 1
+	private int	   counter	   = 0;
+	public  int	   movesSinceCap = 0;
 
 	public Piece getSquare(String s) {
 		return getSquare(new Location(s));
@@ -28,6 +31,30 @@ public class Board {
 	public void setSquare(Location l, Piece p) {
 		squares[l.getY()][l.getX()] = p;
 		if (p != null) p.setLocation(l);
+	}
+
+	public int getCounter() {
+		return counter;
+	}
+
+	public void setCounter(int count) {
+		this.counter = count;
+	}
+
+	public void incrCounter() {
+		counter++;
+	}
+
+	public int getMovesSinceCap() {
+		return movesSinceCap;
+	}
+
+	public void setMovesSinceCap(int count) {
+		this.movesSinceCap = count;
+	}
+
+	public void incrMovesSinceCap() {
+		movesSinceCap++;
 	}
 
 	private ArrayList<Move> moves;
@@ -110,6 +137,12 @@ public class Board {
 
 		String[] components = fen.split(" ");
 		String layout = components[0];
+		PieceColor turn = components[1].equalsIgnoreCase("w") ? PieceColor.WHITE : PieceColor.BLACK;
+		String castling = components[2];
+		String passant = components[3];
+		String halfClock = components[4];
+		String counter = components[5];
+
 		int index = 63; // iterate through the board
 		for (Character p : layout.toCharArray()) {
 			if (p == '/') continue;
@@ -123,12 +156,121 @@ public class Board {
 				continue;
 			} catch (NumberFormatException nfe) {
 				try {
-					setSquare(new Location(file, rank), Piece.fromFEN(p.toString()));
+					Piece piece = Piece.fromFEN(p.toString());
+					PieceColor color = piece.getColor();
+					setSquare(new Location(file, rank), piece);
+
+					if (piece instanceof Rook || piece instanceof King) {
+						if (color == PieceColor.WHITE) {
+							if ((file == 0 && !castling.contains("Q")) || (file == 7 && !castling.contains("K")))
+								piece.setNumMoves(1);
+						} else if (color == PieceColor.BLACK) {
+							if ((file == 0 && !castling.contains("q")) || (file == 7 && !castling.contains("k")))
+								piece.setNumMoves(1);
+						}
+					} else if (piece instanceof Pawn) {
+						if ((color == PieceColor.WHITE && rank != 1) || (color == PieceColor.BLACK && rank != 6))
+							piece.setNumMoves(1); //No double moving!
+					}
 				} catch (UnsupportedOperationException uoe) {
 					throw new IllegalArgumentException("Invalid character in FEN string: " + p);
 				}
 			}
 		}
+
+		if (!passant.equals("-")) {
+			Location loc = new Location(passant);
+			Piece owner = getSquare(loc.add(0, turn == PieceColor.WHITE ? -1 : 1));
+			if (owner == null || owner.getColor() != turn.getOpposite() || !(owner instanceof Pawn))
+				System.err.println("Could not add a passant target to " + passant + " as there is no corresponding pawn in front of it.");
+			else
+				setSquare(loc, new PassantTarget((Pawn) owner));
+		}
+
+		try {
+			int half = Integer.parseInt(halfClock);
+			setMovesSinceCap(half);
+		} catch (NumberFormatException e) {
+			System.err.println("Could not set the capture clock. '" + halfClock + "' is not a number. 0 will be used as default.");
+		}
+
+		try {
+			int count = Integer.parseInt(counter);
+			setCounter(((count-1) * 2 + (turn == PieceColor.WHITE ? 0 : 1))); //FEN counter strings start at 1, our counter starts at 0.
+			System.out.println("Counter set to " + getCounter());
+		} catch (NumberFormatException e) {
+			System.err.println("Could not set the move counter. '" + counter + "' is not a number. 1 will be used as default.");
+		}
+	}
+
+	public String toFEN() {
+		StringBuilder ret = new StringBuilder();
+		for (int rank = 7; rank >= 0; rank--) { //Build the layout
+			int empty = 0;
+			for (int file = 0; file < 8; file++) {
+				Piece p = getSquare(new Location(file, rank));
+				if (p == null || p instanceof PassantTarget) {
+					empty++;
+					continue;
+				} else {
+					if (empty > 0) {
+						ret.append(empty);
+						empty = 0;
+					}
+					ret.append(p.getNotation());
+				}
+			}
+			if (empty > 0)
+				ret.append(empty);
+
+			if (rank != 0)
+				ret.append("/");
+		}
+
+		ret.append(" ").append(counter % 2 == 0 ? "w" : "b"); //Whose turn is it?
+
+		//Is casting available?
+		boolean canCastleSet = false;
+		ret.append(" ");
+		for (PieceColor color : PieceColor.values()) {
+			King king = getKing(color);
+			if (king.getNumMoves() > 0)
+				continue;
+			Piece rank0 = getSquare(new Location(0, king.getLocation().getY()));
+			Piece rank7 = getSquare(new Location(7, king.getLocation().getY()));
+			if (rank7 instanceof Rook) {
+				if (rank7.getNumMoves() == 0) {
+					ret.append(color == PieceColor.WHITE ? "K" : "k");
+					canCastleSet = true;
+				}
+			}
+			if (rank0 instanceof Rook) {
+				if (rank0.getNumMoves() == 0) {
+					ret.append(color == PieceColor.WHITE ? "Q" : "q");
+					canCastleSet = true;
+				}
+			}
+		}
+		if (!canCastleSet) ret.append("-");
+
+		//Construct passant target string
+		boolean passantSet = false;
+		ret.append(" ");
+		for (Piece piece : getAllPieces()) {
+			if (piece instanceof PassantTarget) {
+				ret.append(piece.getLocation());
+				passantSet = true;
+			}
+		}
+		if (!passantSet) ret.append("-");
+
+		//Set the half clock (the moves since last cap)
+		ret.append(" ").append(getMovesSinceCap());
+
+		//Set the turn indicator, adding 1 because fen starts at 1 and we start at 0.
+		ret.append(" ").append(getCounter() / 2 + 1);
+
+		return ret.toString();
 	}
 
 	public void clearBoard() {
@@ -257,6 +399,46 @@ public class Board {
 		return false;
 	}
 
+	public boolean contains(ArrayList<Piece> arr, Class<? extends Piece> type) {
+		return arr.stream().anyMatch(type::isInstance);
+	}
+
+	public boolean isDeadPosition() {
+		ArrayList<Piece> all = getAllPieces();
+		if (all.size() > 4) return false;
+
+		//Possible combinations are
+		//K v k
+		//K v k n
+		//K v k b
+		//K B v k b
+
+		if (all.size() == 2 // K v k
+				|| (contains(all, Knight.class) && all.size() == 3)) return true; // K v k n OR K N vs k
+		else if (contains(all, Bishop.class)) {
+			if (all.size() == 3) return true; // K v k b OR K B v k
+			else if (all.size() == 4) {
+				ArrayList<Piece> white = getAllPieces(PieceColor.WHITE);
+				ArrayList<Piece> black = getAllPieces(PieceColor.BLACK);
+				if (white.size() == 3 || black.size() == 3) return false;
+
+				Bishop wB = white.stream().filter(p -> p instanceof Bishop).findFirst().map(p -> (Bishop) p).orElse(null);
+				Bishop bb = black.stream().filter(p -> p instanceof Bishop).findFirst().map(p -> (Bishop) p).orElse(null);
+				if (wB == null || bb == null)
+					return false; //In this case, we have king and something vs king and bishop. In this case, checkmate is still potentially possible.
+
+				PieceColor wBColor = wB.getLocation().getX() % 2 == 0 ? PieceColor.BLACK : PieceColor.WHITE;
+				if (wB.getLocation().getY() % 2 == 1) wBColor = wBColor.getOpposite();
+
+				PieceColor bbColor = bb.getLocation().getX() % 2 == 0 ? PieceColor.BLACK : PieceColor.WHITE;
+				if (bb.getLocation().getY() % 2 == 1) bbColor = bbColor.getOpposite();
+
+				return wBColor == bbColor;
+			}
+		}
+		return false;
+	}
+
 	public boolean movePiece(String from, String to) {
 		return movePiece(new Location(from), new Location(to));
 	}
@@ -296,16 +478,11 @@ public class Board {
 			setSquare(to, p);
 			setSquare(from, null);
 
+			boolean passant = false;
 			if (victim != null) {
-				boolean passant = p instanceof Pawn && victim instanceof PassantTarget;
-				if (p instanceof Pawn && from.getX() != p.getLocation().getX()) {//The location has been updated to the 'to' location
-					if (victim instanceof PassantTarget) {
-						setSquare(((PassantTarget) victim).getOwner().getLocation(), null);
-					}
-				}
-				if (!this.isGhostBoard) {
-					capture.setPassant(passant);
-					EventRegistry.callEvents(capture);
+				passant = p instanceof Pawn && victim instanceof PassantTarget;
+				if (passant && from.getX() != p.getLocation().getX()) {//The location has been updated to the 'to' location
+					setSquare(((PassantTarget) victim).getOwner().getLocation(), null);
 				}
 			}
 
@@ -354,6 +531,10 @@ public class Board {
 			if (!this.isGhostBoard) {
 				PostPieceMoveEvent post = new PostPieceMoveEvent(p, this);
 				EventRegistry.callEvents(post);
+				if (victim != null) {
+					capture.setPassant(passant);
+					EventRegistry.callEvents(capture);
+				}
 			}
 		}
 
@@ -378,6 +559,7 @@ public class Board {
 	}
 
 	public boolean castle(King king, Rook rook) {
+		if (king.getLocation().getY() != rook.getLocation().getY()) return false;
 		int dx = rook.getLocation().getX() - king.getLocation().getX();
 		if (dx < 0)
 			dx += 2;
@@ -443,6 +625,7 @@ public class Board {
 	}
 
 	public boolean isInCheck(King king) {
+		if (king == null) return false;
 		for (Piece piece : getAllPieces(king.getColor().getOpposite())) {
 			if (pieceCreatesCheck(piece, king)) {
 				return true;

@@ -2,9 +2,7 @@ package edu.neumont.chessmasters.events;
 
 import edu.neumont.chessmasters.models.Board;
 import edu.neumont.chessmasters.models.Location;
-import edu.neumont.chessmasters.models.pieces.King;
 import edu.neumont.chessmasters.models.pieces.Piece;
-import edu.neumont.chessmasters.models.pieces.Rook;
 
 public class PrePieceMoveEvent extends Event {
 
@@ -14,6 +12,12 @@ public class PrePieceMoveEvent extends Event {
     private       Location location;
     private       boolean  isCastle  = false; //Derived based on the piece passed in and the potential piece at the location
     private       boolean  cancelled = false;
+    private       boolean  quiet     = false;
+
+    public PrePieceMoveEvent(Piece piece, Location location, Board board, boolean quiet) {
+        this(piece, location, board);
+        this.quiet = quiet;
+    }
 
     public PrePieceMoveEvent(Piece piece, Location location, Board board) {
         this.piece = piece;
@@ -60,6 +64,14 @@ public class PrePieceMoveEvent extends Event {
 
     public void setCastle(boolean castle) {
         isCastle = castle;
+    }
+
+    public boolean isQuiet() {
+        return quiet;
+    }
+
+    public void setQuiet(boolean quiet) {
+        this.quiet = quiet;
     }
 
     /**
