@@ -1,6 +1,7 @@
 package edu.neumont.chessmasters.controllers;
 
 import edu.neumont.chessmasters.ChessMasters;
+import edu.neumont.chessmasters.Utils;
 import edu.neumont.chessmasters.exceptions.IncompleteMoveException;
 import edu.neumont.chessmasters.models.Board;
 import edu.neumont.chessmasters.models.GameSettings;
@@ -15,15 +16,15 @@ import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static org.fusesource.jansi.Ansi.ansi;
+
 public class PlayerMove {
 
     private        Board        board;
     private static PlayerMove   inst;
     private        String       status   = null;
-    private        boolean      gameOver = false;
+    private        boolean      gameOver;
     private        GameSettings options;
-    public         String       positionOne;
-    public         String       positionTwo;
 
     public String getColorName() {
         return getColorName(board.getCounter());
@@ -153,6 +154,7 @@ public class PlayerMove {
         board.clearPassant(getColor());
 
         // 2. Print board
+        Utils.clearConsole();
         System.out.println("\n\n" + board.toString(options.flip ? getColor() : PieceColor.WHITE, options.traceMoves));
         // 2.1 End-game logic, assuming we have not already reached end-game
         if (!gameOver) {
@@ -190,6 +192,7 @@ public class PlayerMove {
                     this.setGameOver();
                     return false; // exits method, indicating game is over
                 case "board":
+                    Utils.clearConsole();
                     System.out.println("\n\n" + board.toString(options.flip ? getColor() : PieceColor.WHITE, options.traceMoves));
                     continue; // skips rest of loop and asks again for a move
                 case "moves":
@@ -205,6 +208,7 @@ public class PlayerMove {
                     System.out.println(board.toFEN());
                     continue;
                 case "options":
+                case "settings":
                     editOptions();
                     continue;
                     // 3.2.2 Continue if it wasn't a forfeit
@@ -358,8 +362,13 @@ public class PlayerMove {
                     debug.setOption("Debug: \t" + getSettings().debug);
 
                     ChessMasters.loadSettings(getSettings());
+
+                    Utils.clearConsole();
                 });
         menu.open(true);
+
+        Utils.clearConsole();
+        System.out.println("\n\n" + board.toString(options.flip ? getColor() : PieceColor.WHITE, options.traceMoves));
     }
 
 }

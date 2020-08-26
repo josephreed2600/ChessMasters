@@ -1,10 +1,17 @@
 package edu.neumont.chessmasters;
 
+import static org.fusesource.jansi.Ansi.ansi;
+
 public class Utils {
 	public static boolean USE_UNICODE = !System.getProperty("os.name").startsWith("Windows");
 	public static boolean USE_ANSI = !System.getProperty("os.name").startsWith("Windows");
 
-	public static class Drawing {
+    public static void clearConsole() {
+		if (USE_ANSI)
+			System.out.println(ansi().eraseScreen());
+    }
+
+    public static class Drawing {
 		public static class Corners {
 			public static String topLeft        () { return  USE_UNICODE ? "\u250c" : "+"; }
 			public static String topRight       () { return  USE_UNICODE ? "\u2510" : "+"; }
