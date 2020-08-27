@@ -294,13 +294,26 @@ public class PlayerMove {
     }
 
 
-    public void saveGame() {
-        FileUtils.write("save-ChessMasters", board.toFEN());
+    public void saveGame() throws EOFException {
 
+        String input = " ";
 
-        if (FileUtils.readFileFully("save-ChessMasters") == board.toFEN()) {
-            System.out.println("your game is saved");
+        if(!FileUtils.readFileFully("save-ChessMasters").isEmpty()){
+            System.out.println("would you like to override a past game (Y/N)");
+            input = IOUtils.promptForString("Enter");
+
+            if(input.equals("y") || input.equals("Y")){
+                FileUtils.write("save-ChessMasters", board.toFEN());
+                if (FileUtils.readFileFully("save-ChessMasters").equals(board.toFEN()) ) {
+                    System.out.println("your game is saved");
+                }
+            }else {
+                System.out.println("Game was not overwritten");
+            }
         }
+
+
+
 
 
     }
@@ -311,7 +324,8 @@ public class PlayerMove {
 
 
         Board savedBoard = new Board(boardFen);
-        System.out.println(savedBoard);
+        board = savedBoard;
+        System.out.println(board);
 
     }
 
