@@ -49,6 +49,7 @@ public class Move {
 		public static Move fromFreeform(String input, Board board) throws IncompleteMoveException {
 			// check for king-side castling
 			if (Pattern.matches("[Oo]-?[Oo]", input)) {
+				System.err.println("[ debug ] Parsing castling O-notation");
 				if (Utils.Turns.getColor(board) == PieceColor.WHITE)
 					return Move.fromFreeform("e1 h1", board);
 				else
@@ -56,6 +57,7 @@ public class Move {
 			}
 			// check for queen-side castling
 			if (Pattern.matches("[Oo]-?[Oo]-?[Oo]", input)) {
+				System.err.println("[ debug ] Parsing castling O-notation");
 				if (Utils.Turns.getColor(board) == PieceColor.WHITE)
 					return Move.fromFreeform("e1 a1", board);
 				else
