@@ -164,6 +164,7 @@ public class PlayerMove {
             // 3.2 Check whether it's a predefined command
             switch (input) {
                 case "exit":
+                case "quit":
                     // 3.2.1 Execute command
                     System.exit(0); // exits application
                 case "forfeit":
