@@ -1,7 +1,9 @@
 package edu.neumont.chessmasters.models;
 
 import edu.neumont.chessmasters.ChessMasters;
+import edu.neumont.chessmasters.Utils;
 import edu.neumont.chessmasters.models.Location;
+import edu.neumont.chessmasters.models.pieces.PieceColor;
 import edu.neumont.chessmasters.exceptions.IncompleteMoveException;
 
 import java.util.regex.Pattern;
@@ -45,6 +47,20 @@ public class Move {
 		}
 
 		public static Move fromFreeform(String input, Board board) throws IncompleteMoveException {
+			// check for king-side castling
+			if (Pattern.matches("[Oo]-?[Oo]", input)) {
+				if (Utils.Turns.getColor(board) == PieceColor.WHITE)
+					return Move.fromFreeform("e1 h1", board);
+				else
+					return Move.fromFreeform("e8 h8", board);
+			}
+			// check for queen-side castling
+			if (Pattern.matches("[Oo]-?[Oo]-?[Oo]", input)) {
+				if (Utils.Turns.getColor(board) == PieceColor.WHITE)
+					return Move.fromFreeform("e1 a1", board);
+				else
+					return Move.fromFreeform("e8 a8", board);
+			}
 			if (Pattern.matches("[A-Ha-h][1-8] [A-Ha-h][1-8]", input)) {
 				return fromSrcDest(input);
 			}
