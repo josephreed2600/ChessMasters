@@ -501,27 +501,31 @@ public class Board {
 					choiceInput.toLowerCase();
 					switch(choiceInput) {
 						case "queen" :
+						case "q" :
 							p = new Queen(p.getColor());
 							setSquare(to, p);
 							validInput = true;
 							break;
 						case "knight" :
+						case "k" :
 							p = new Knight(p.getColor());
 							setSquare(to, p);
 							validInput = true;
 							break;
 						case "rook" :
+						case "r" :
 							p = new Rook(p.getColor());
 							setSquare(to, p);
 							validInput = true;
 							break;
 						case "bishop" :
+						case "b" :
 							p = new Bishop(p.getColor());
 							setSquare(to, p);
 							validInput = true;
 							break;
 						default:
-							System.out.println("Invalid piece.");
+							System.out.println("Unknown piece type: \"" + choiceInput + "\"");
 							break;
 					}
 				} while(!validInput);
