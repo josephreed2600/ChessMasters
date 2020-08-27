@@ -27,44 +27,25 @@ public class PlayerMove {
     private        GameSettings options;
 
     public String getColorName() {
-        return getColorName(board.getCounter());
-    }
-
-    public static String getColorName(int halfturn) {
-        return halfturn % 2 == 0 ? "White" : "Black";
+        return Utils.Turns.getColorName(board);
     }
 
     public PieceColor getColor() {
-        return getColor(board.getCounter());
-    }
-
-    public static PieceColor getColor(int halfturn) {
-        return halfturn % 2 == 0 ? PieceColor.WHITE : PieceColor.BLACK;
+        return Utils.Turns.getColor(board);
     }
 
     public int getTurn() {
-        return getTurn(board.getCounter());
-    }
-
-    public static int getTurn(int halfturn) {
-        return halfturn / 2 + 1;
+        return Utils.Turns.getTurn(board);
     }
 
     public boolean isWhite() {
-        return isWhite(board.getCounter());
-    }
-
-    public static boolean isWhite(int halfturn) {
-        return halfturn % 2 == 0;
+        return Utils.Turns.isWhite(board);
     }
 
     public boolean isBlack() {
-        return isBlack(board.getCounter());
+        return Utils.Turns.isBlack(board);
     }
 
-    public static boolean isBlack(int halfturn) {
-        return halfturn % 2 == 1;
-    }
 
     public GameSettings getSettings() {
         return options;

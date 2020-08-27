@@ -1,5 +1,8 @@
 package edu.neumont.chessmasters;
 
+import edu.neumont.chessmasters.models.Board;
+import edu.neumont.chessmasters.models.pieces.PieceColor;
+
 import static org.fusesource.jansi.Ansi.ansi;
 
 public class Utils {
@@ -82,5 +85,39 @@ public class Utils {
 		}
 		out.append(right);
 		return out.toString();
+	}
+
+	public static class Turns {
+		public static String getColorName(int halfturn) {
+			return halfturn % 2 == 0 ? "White" : "Black";
+		}
+    public static PieceColor getColor(int halfturn) {
+        return halfturn % 2 == 0 ? PieceColor.WHITE : PieceColor.BLACK;
+    }
+		public static int getTurn(int halfturn) {
+			return halfturn / 2 + 1;
+		}
+		public static boolean isWhite(int halfturn) {
+			return halfturn % 2 == 0;
+		}
+		public static boolean isBlack(int halfturn) {
+			return halfturn % 2 == 1;
+		}
+
+		public static String getColorName(Board board) {
+			return board.getCounter() % 2 == 0 ? "White" : "Black";
+		}
+    public static PieceColor getColor(Board board) {
+        return board.getCounter() % 2 == 0 ? PieceColor.WHITE : PieceColor.BLACK;
+    }
+		public static int getTurn(Board board) {
+			return board.getCounter() / 2 + 1;
+		}
+		public static boolean isWhite(Board board) {
+			return board.getCounter() % 2 == 0;
+		}
+		public static boolean isBlack(Board board) {
+			return board.getCounter() % 2 == 1;
+		}
 	}
 }
