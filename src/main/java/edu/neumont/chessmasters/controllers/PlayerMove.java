@@ -10,9 +10,12 @@ import edu.neumont.chessmasters.models.pieces.Piece;
 import edu.neumont.chessmasters.models.pieces.PieceColor;
 import me.travja.utils.menu.Menu;
 import me.travja.utils.menu.MenuOption;
+import me.travja.utils.utils.FileUtils;
 import me.travja.utils.utils.IOUtils;
 
 import java.io.EOFException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -20,11 +23,21 @@ import static org.fusesource.jansi.Ansi.ansi;
 
 public class PlayerMove {
 
+
+//    private Board board;
+//    private static PlayerMove inst;
+//    private String status = null;
+//    private boolean gameOver = false;
+//    private GameSettings options;
+//    public String positionOne;
+//    public String positionTwo;
+
     private        Board        board;
     private static PlayerMove   inst;
     private        String       status   = null;
     private        boolean      gameOver;
     private        GameSettings options;
+
 
     public String getColorName() {
         return Utils.Turns.getColorName(board);
@@ -193,6 +206,12 @@ public class PlayerMove {
                 case "settings":
                     editOptions();
                     continue;
+                case "save":
+                    saveGame();
+                    continue;
+                case "load":
+                    loadGame();
+                    continue;
                     // 3.2.2 Continue if it wasn't a forfeit
                 default:
                     break; // carries on with loop
@@ -274,6 +293,29 @@ public class PlayerMove {
     public void dumpMoveLog() {
         System.out.println("\nMove history:\n\n" + board.getMoveHistory() + "\n");
     }
+
+
+    public void saveGame() {
+        FileUtils.write("save-ChessMasters", board.toFEN());
+
+
+        if (FileUtils.readFileFully("save-ChessMasters") == board.toFEN()) {
+            System.out.println("your game is saved");
+        }
+
+
+    }
+
+
+    public void loadGame() {
+        String boardFen = FileUtils.readFileFully("save-ChessMasters");
+
+
+        Board savedBoard = new Board(boardFen);
+        System.out.println(savedBoard);
+
+    }
+
 
     private void editOptions() {
         MenuOption colors = new MenuOption("Colors: \t" + (getSettings().color != null ? getSettings().color : "auto"), () -> {
