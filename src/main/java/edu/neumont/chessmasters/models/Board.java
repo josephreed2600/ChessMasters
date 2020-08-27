@@ -8,8 +8,6 @@ import edu.neumont.chessmasters.events.PostPieceMoveEvent;
 import edu.neumont.chessmasters.models.pieces.*;
 import me.travja.utils.utils.IOUtils;
 
-import java.io.EOFException;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class Board {
@@ -110,7 +108,7 @@ public class Board {
 
 	public Board(Board original, boolean isGhost) {
 		this.squares = new Piece[8][8];
-		this.moves = (ArrayList<Move>)original.getMoves().clone();
+		this.moves = (ArrayList<Move>) original.getMoves().clone();
 		this.isGhostBoard = isGhost;
 
 		// copy pieces over
@@ -196,7 +194,7 @@ public class Board {
 
 		try {
 			int count = Integer.parseInt(counter);
-			setCounter(((count-1) * 2 + (turn == PieceColor.WHITE ? 0 : 1))); //FEN counter strings start at 1, our counter starts at 0.
+			setCounter(((count - 1) * 2 + (turn == PieceColor.WHITE ? 0 : 1))); //FEN counter strings start at 1, our counter starts at 0.
 		} catch (NumberFormatException e) {
 			System.err.println("[ warn ] Could not set the move counter. '" + counter + "' is not a number. 1 will be used as default.");
 		}
@@ -492,34 +490,30 @@ public class Board {
 				String choiceInput = "";
 				boolean validInput = false;
 				do {
-					try {
-						choiceInput = IOUtils.promptForString("What would you like to promote your piece to (Queen, Knight, Rook, or Bishop)?: ").toLowerCase();
-					} catch (EOFException e) {
-						e.printStackTrace();
-					}
+					choiceInput = IOUtils.promptForString("What would you like to promote your piece to (Queen, Knight, Rook, or Bishop)?: ").toLowerCase();
 
 					choiceInput.toLowerCase();
 					switch(choiceInput) {
-						case "queen" :
-						case "q" :
+						case "queen":
+						case "q":
 							p = new Queen(p.getColor());
 							setSquare(to, p);
 							validInput = true;
 							break;
-						case "knight" :
-						case "k" :
+						case "knight":
+						case "k":
 							p = new Knight(p.getColor());
 							setSquare(to, p);
 							validInput = true;
 							break;
-						case "rook" :
-						case "r" :
+						case "rook":
+						case "r":
 							p = new Rook(p.getColor());
 							setSquare(to, p);
 							validInput = true;
 							break;
-						case "bishop" :
-						case "b" :
+						case "bishop":
+						case "b":
 							p = new Bishop(p.getColor());
 							setSquare(to, p);
 							validInput = true;
@@ -528,7 +522,7 @@ public class Board {
 							System.out.println("Unknown piece type: \"" + choiceInput + "\"");
 							break;
 					}
-				} while(!validInput);
+				} while (!validInput);
 			}
 
 			if (!this.isGhostBoard) {
@@ -707,8 +701,8 @@ public class Board {
 
 				// highlight last move if applicable
 				if (highlightLast && getMoves().size() > 0) {
-					Location thisSquare = (side == PieceColor.WHITE ? new Location(col, row) : new Location(7-col, 7-row));
-					Move lastMove = getMoves().get(getMoves().size()-1);
+					Location thisSquare = (side == PieceColor.WHITE ? new Location(col, row) : new Location(7 - col, 7 - row));
+					Move lastMove = getMoves().get(getMoves().size() - 1);
 					if (thisSquare.equals(lastMove.from)) {
 						sb_out.append(Utils.Styles.sourceSquare());
 					} else if (thisSquare.equals(lastMove.to)) {
