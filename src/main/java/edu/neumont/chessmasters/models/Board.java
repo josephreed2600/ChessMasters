@@ -182,7 +182,7 @@ public class Board {
 			Location loc = new Location(passant);
 			Piece owner = getSquare(loc.add(0, turn == PieceColor.WHITE ? -1 : 1));
 			if (owner == null || owner.getColor() != turn.getOpposite() || !(owner instanceof Pawn))
-				System.err.println("Could not add a passant target to " + passant + " as there is no corresponding pawn in front of it.");
+				System.err.println("[ warn ] Could not add a passant target to " + passant + " as there is no corresponding pawn in front of it.");
 			else
 				setSquare(loc, new PassantTarget((Pawn) owner));
 		}
@@ -191,14 +191,14 @@ public class Board {
 			int half = Integer.parseInt(halfClock);
 			setMovesSinceCap(half);
 		} catch (NumberFormatException e) {
-			System.err.println("Could not set the capture clock. '" + halfClock + "' is not a number. 0 will be used as default.");
+			System.err.println("[ warn ] Could not set the capture clock. '" + halfClock + "' is not a number. 0 will be used as default.");
 		}
 
 		try {
 			int count = Integer.parseInt(counter);
 			setCounter(((count-1) * 2 + (turn == PieceColor.WHITE ? 0 : 1))); //FEN counter strings start at 1, our counter starts at 0.
 		} catch (NumberFormatException e) {
-			System.err.println("Could not set the move counter. '" + counter + "' is not a number. 1 will be used as default.");
+			System.err.println("[ warn ] Could not set the move counter. '" + counter + "' is not a number. 1 will be used as default.");
 		}
 	}
 
@@ -501,27 +501,31 @@ public class Board {
 					choiceInput.toLowerCase();
 					switch(choiceInput) {
 						case "queen" :
+						case "q" :
 							p = new Queen(p.getColor());
 							setSquare(to, p);
 							validInput = true;
 							break;
 						case "knight" :
+						case "k" :
 							p = new Knight(p.getColor());
 							setSquare(to, p);
 							validInput = true;
 							break;
 						case "rook" :
+						case "r" :
 							p = new Rook(p.getColor());
 							setSquare(to, p);
 							validInput = true;
 							break;
 						case "bishop" :
+						case "b" :
 							p = new Bishop(p.getColor());
 							setSquare(to, p);
 							validInput = true;
 							break;
 						default:
-							System.out.println("Invalid piece.");
+							System.out.println("Unknown piece type: \"" + choiceInput + "\"");
 							break;
 					}
 				} while(!validInput);

@@ -48,7 +48,7 @@ public class EventRegistry {
                     try {
                         method.invoke(obj, event);
                     } catch (IllegalAccessException | InvocationTargetException e) {
-                        System.out.println("Could not call event '" + event.getName() + "'. Please see the following error:");
+                        System.err.println("[ err ] Could not call event '" + event.getName() + "'. Please see the following error:");
                         e.printStackTrace();
                     }
                 }
