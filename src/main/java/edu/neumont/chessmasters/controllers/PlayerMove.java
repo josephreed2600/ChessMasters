@@ -1,6 +1,7 @@
 package edu.neumont.chessmasters.controllers;
 
 import edu.neumont.chessmasters.ChessMasters;
+import edu.neumont.chessmasters.Utils;
 import edu.neumont.chessmasters.exceptions.IncompleteMoveException;
 import edu.neumont.chessmasters.models.Board;
 import edu.neumont.chessmasters.models.GameSettings;
@@ -18,55 +19,46 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static org.fusesource.jansi.Ansi.ansi;
+
 public class PlayerMove {
 
-    private Board board;
-    private static PlayerMove inst;
-    private String status = null;
-    private boolean gameOver = false;
-    private GameSettings options;
-    public String positionOne;
-    public String positionTwo;
+
+//    private Board board;
+//    private static PlayerMove inst;
+//    private String status = null;
+//    private boolean gameOver = false;
+//    private GameSettings options;
+//    public String positionOne;
+//    public String positionTwo;
+
+    private        Board        board;
+    private static PlayerMove   inst;
+    private        String       status   = null;
+    private        boolean      gameOver;
+    private        GameSettings options;
+
 
     public String getColorName() {
-        return getColorName(board.getCounter());
-    }
-
-    public static String getColorName(int halfturn) {
-        return halfturn % 2 == 0 ? "White" : "Black";
+        return Utils.Turns.getColorName(board);
     }
 
     public PieceColor getColor() {
-        return getColor(board.getCounter());
-    }
-
-    public static PieceColor getColor(int halfturn) {
-        return halfturn % 2 == 0 ? PieceColor.WHITE : PieceColor.BLACK;
+        return Utils.Turns.getColor(board);
     }
 
     public int getTurn() {
-        return getTurn(board.getCounter());
-    }
-
-    public static int getTurn(int halfturn) {
-        return halfturn / 2 + 1;
+        return Utils.Turns.getTurn(board);
     }
 
     public boolean isWhite() {
-        return isWhite(board.getCounter());
-    }
-
-    public static boolean isWhite(int halfturn) {
-        return halfturn % 2 == 0;
+        return Utils.Turns.isWhite(board);
     }
 
     public boolean isBlack() {
-        return isBlack(board.getCounter());
+        return Utils.Turns.isBlack(board);
     }
 
-    public static boolean isBlack(int halfturn) {
-        return halfturn % 2 == 1;
-    }
 
     public GameSettings getSettings() {
         return options;
@@ -156,6 +148,7 @@ public class PlayerMove {
         board.clearPassant(getColor());
 
         // 2. Print board
+        Utils.clearConsole();
         System.out.println("\n\n" + board.toString(options.flip ? getColor() : PieceColor.WHITE, options.traceMoves));
         // 2.1 End-game logic, assuming we have not already reached end-game
         if (!gameOver) {
@@ -193,6 +186,7 @@ public class PlayerMove {
                     this.setGameOver();
                     return false; // exits method, indicating game is over
                 case "board":
+                    Utils.clearConsole();
                     System.out.println("\n\n" + board.toString(options.flip ? getColor() : PieceColor.WHITE, options.traceMoves));
                     continue; // skips rest of loop and asks again for a move
                 case "moves":
@@ -208,6 +202,7 @@ public class PlayerMove {
                     System.out.println(board.toFEN());
                     continue;
                 case "options":
+                case "settings":
                     editOptions();
                     continue;
                 case "save":
@@ -390,8 +385,13 @@ public class PlayerMove {
                     debug.setOption("Debug: \t" + getSettings().debug);
 
                     ChessMasters.loadSettings(getSettings());
+
+                    Utils.clearConsole();
                 });
         menu.open(true);
+
+        Utils.clearConsole();
+        System.out.println("\n\n" + board.toString(options.flip ? getColor() : PieceColor.WHITE, options.traceMoves));
     }
 
 }

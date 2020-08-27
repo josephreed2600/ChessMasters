@@ -1,10 +1,20 @@
 package edu.neumont.chessmasters;
 
+import edu.neumont.chessmasters.models.Board;
+import edu.neumont.chessmasters.models.pieces.PieceColor;
+
+import static org.fusesource.jansi.Ansi.ansi;
+
 public class Utils {
 	public static boolean USE_UNICODE = !System.getProperty("os.name").startsWith("Windows");
 	public static boolean USE_ANSI = !System.getProperty("os.name").startsWith("Windows");
 
-	public static class Drawing {
+    public static void clearConsole() {
+		if (USE_ANSI)
+			System.out.println(ansi().eraseScreen());
+    }
+
+    public static class Drawing {
 		public static class Corners {
 			public static String topLeft        () { return  USE_UNICODE ? "\u250c" : "+"; }
 			public static String topRight       () { return  USE_UNICODE ? "\u2510" : "+"; }
@@ -75,5 +85,39 @@ public class Utils {
 		}
 		out.append(right);
 		return out.toString();
+	}
+
+	public static class Turns {
+		public static String getColorName(int halfturn) {
+			return halfturn % 2 == 0 ? "White" : "Black";
+		}
+    public static PieceColor getColor(int halfturn) {
+        return halfturn % 2 == 0 ? PieceColor.WHITE : PieceColor.BLACK;
+    }
+		public static int getTurn(int halfturn) {
+			return halfturn / 2 + 1;
+		}
+		public static boolean isWhite(int halfturn) {
+			return halfturn % 2 == 0;
+		}
+		public static boolean isBlack(int halfturn) {
+			return halfturn % 2 == 1;
+		}
+
+		public static String getColorName(Board board) {
+			return board.getCounter() % 2 == 0 ? "White" : "Black";
+		}
+    public static PieceColor getColor(Board board) {
+        return board.getCounter() % 2 == 0 ? PieceColor.WHITE : PieceColor.BLACK;
+    }
+		public static int getTurn(Board board) {
+			return board.getCounter() / 2 + 1;
+		}
+		public static boolean isWhite(Board board) {
+			return board.getCounter() % 2 == 0;
+		}
+		public static boolean isBlack(Board board) {
+			return board.getCounter() % 2 == 1;
+		}
 	}
 }
