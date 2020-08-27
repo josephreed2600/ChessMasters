@@ -48,6 +48,10 @@ public class Move {
 			if (Pattern.matches("[A-Ha-h][1-8] [A-Ha-h][1-8]", input)) {
 				return fromSrcDest(input);
 			}
+			// someone please know a better way to do this
+			if (Pattern.matches("[A-Ha-h][1-8][A-Ha-h][1-8]", input)) {
+				return fromSrcDest(input.substring(0,2) + " " + input.substring(2,4));
+			}
 			if (Pattern.matches("[A-Ha-h][1-8]", input)) {
 				throw new IncompleteMoveException("Missing destination square");
 			}
