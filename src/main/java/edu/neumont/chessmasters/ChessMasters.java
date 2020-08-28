@@ -129,24 +129,11 @@ public class ChessMasters {
                         if (temp != null) options.flip = temp;
                         break;
 
-						/*
-					case "--file":
-					case "-f":
-						// handle files here
-						if (argv.size() < 1) {
-							System.err.println("[ warn ] Option " + option + " expects a file path; received nothing. Ignoring");
-							break;
-						}
-						options.filePath = argv.remove(0);
-						options.fileContents = FileUtils.readFileFully(options.filePath);
-						System.err.println("Found file contents:\n" + options.fileContents);
-						break;
-						*/
-
                     default:
                         // ignore unknown options
                         // actually, right now, let's complain about them
-                        System.err.println("[ warn ] unknown option: " + option);
+												if (options.debug)
+													System.err.println("[ warn ] unknown option: " + option);
                         break;
                 }
         }
