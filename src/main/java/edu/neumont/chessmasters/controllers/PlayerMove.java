@@ -24,19 +24,13 @@ import static org.fusesource.jansi.Ansi.ansi;
 public class PlayerMove {
 
 
-//    private Board board;
-//    private static PlayerMove inst;
-//    private String status = null;
-//    private boolean gameOver = false;
-//    private GameSettings options;
-//    public String positionOne;
-//    public String positionTwo;
 
-    private        Board        board;
-    private static PlayerMove   inst;
-    private        String       status   = null;
-    private        boolean      gameOver;
-    private        GameSettings options;
+
+    private Board board;
+    private static PlayerMove inst;
+    private String status = null;
+    private boolean gameOver;
+    private GameSettings options;
 
 
     public String getColorName() {
@@ -299,22 +293,19 @@ public class PlayerMove {
 
         String input = " ";
 
-        if(!FileUtils.readFileFully("save-ChessMasters").isEmpty()){
+        if (!FileUtils.readFileFully("save-ChessMasters").isEmpty()) {
             System.out.println("would you like to override a past game (Y/N)");
             input = IOUtils.promptForString("Enter");
 
-            if(input.equals("y") || input.equals("Y")){
+            if (input.equals("y") || input.equals("Y")) {
                 FileUtils.write("save-ChessMasters", board.toFEN());
-                if (FileUtils.readFileFully("save-ChessMasters").equals(board.toFEN()) ) {
+                if (FileUtils.readFileFully("save-ChessMasters").equals(board.toFEN())) {
                     System.out.println("your game is saved");
                 }
-            }else {
+            } else {
                 System.out.println("Game was not overwritten");
             }
         }
-
-
-
 
 
     }
