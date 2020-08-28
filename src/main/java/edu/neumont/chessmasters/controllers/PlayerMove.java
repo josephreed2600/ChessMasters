@@ -287,6 +287,7 @@ public class PlayerMove {
 					.append("\n\n`forfeit' to give up and optionally play another game")
 					.append("\n\n`quit' or `exit' to close the application")
 					.append("\n\n`dump' to show the move history")
+					.append("\n\n`save' and `load' to save this game or restore the last saved game")
 					.append("\n\n`options' to configure settings")
 					.append("\n\nEn Passant: When a '*' is displayed, an en passant is possible. This occurs when a pawn takes its initial move two spaces, but could be intercepted by an opposing piece. If the opportunity is not taken, it is lost.")
 					.append("\n\nCastling may be accomplished by moving the king to the rook's square, or using O-O to castle king-side and O-O-O to castle queen-side.")
