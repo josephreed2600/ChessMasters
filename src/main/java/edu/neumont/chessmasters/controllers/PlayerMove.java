@@ -284,12 +284,17 @@ public class PlayerMove {
     }
 
     private void helpMenu() {
-        StringBuilder helper = new StringBuilder(" --[ Helper commands ]-- ");
+        StringBuilder helper = new StringBuilder();
 
-        helper.append("\n\nTo move, simply input your target piece (a2) and your destination (a4). Ex: 'a2 a4' moves the piece at a2 to a4")
-                .append("\n\nTo quit/forfeit the game simply type 'quit' whenever\n")
-                .append("\nEn Passant: When a '*' is displayed, an en passant is possible. This occurs when a pawn takes its initial move two spaces,\n")
-                .append("but could be intercepted by an opposing piece. If the opportunity is not taken, it is lost.\n");
+        helper
+					.append("\n\nTo move, simply input your target piece (a2) and your destination (a4). Ex: 'a2 a4' moves the piece at a2 to a4")
+					.append("\n\n`forfeit' to give up and optionally play another game")
+					.append("\n\n`quit' or `exit' to close the application")
+					.append("\n\n`dump' to show the move history")
+					.append("\n\n`options' to configure settings")
+					.append("\n\nEn Passant: When a '*' is displayed, an en passant is possible. This occurs when a pawn takes its initial move two spaces, but could be intercepted by an opposing piece. If the opportunity is not taken, it is lost.")
+					.append("\n\nCastling may be accomplished by moving the king to the rook's square, or using O-O to castle king-side and O-O-O to castle queen-side.")
+					.append("\n");
         setStatus(helper.toString());
         //this.flushStatus();
     }
