@@ -13,13 +13,9 @@ import me.travja.utils.menu.MenuOption;
 import me.travja.utils.utils.FileUtils;
 import me.travja.utils.utils.IOUtils;
 
-import java.io.EOFException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import static org.fusesource.jansi.Ansi.ansi;
 
 public class PlayerMove {
 
@@ -34,7 +30,7 @@ public class PlayerMove {
 
     private        Board        board;
     private static PlayerMove   inst;
-    private        String       status   = null;
+    private        String       status = null;
     private        boolean      gameOver;
     private        GameSettings options;
 
@@ -90,7 +86,7 @@ public class PlayerMove {
         return board;
     }
 
-    public void run(GameSettings options) throws EOFException {
+    public void run(GameSettings options) {
         this.options = options;
         gameOver = false;
         boolean keepPlaying;
@@ -146,7 +142,7 @@ public class PlayerMove {
      * 3.3.1.1 If move is successful, return
      * 3.3.2 If either of these fails, continue prompting
      */
-    public boolean RequestMove() throws EOFException {
+    public boolean RequestMove() {
         // 1. Clear en passant targets for this player
         board.clearPassant(getColor());
 
@@ -305,23 +301,29 @@ public class PlayerMove {
 
 
     public void saveGame() {
-        FileUtils.write("save-ChessMasters", board.toFEN());
 
-
-        if (FileUtils.readFileFully("save-ChessMasters") == board.toFEN()) {
-            System.out.println("your game is saved");
+        boolean overwrite = true;
+        if (new File("save.chess").exists() && !FileUtils.readFileFully("save.chess").isEmpty()) {
+            overwrite = IOUtils.promptForBoolean("It appears here is already a game saved. Would you like to overwrite it? (Y/N)", "y.yes", "n.no");
         }
 
-
+        if (overwrite) {
+            FileUtils.write("save.chess", board.toFEN());
+            if (FileUtils.readFileFully("save.chess").equals(board.toFEN())) {
+                System.out.println("Game saved!");
+            }
+        } else {
+            System.out.println("Game was not overwritten");
+        }
     }
 
 
     public void loadGame() {
-        String boardFen = FileUtils.readFileFully("save-ChessMasters");
-
-
+        System.out.println("Loading game...");
+        String boardFen = FileUtils.readFileFully("save.chess");
         Board savedBoard = new Board(boardFen);
-        System.out.println(savedBoard);
+        board = savedBoard;
+        System.out.println(board);
 
     }
 
@@ -329,66 +331,43 @@ public class PlayerMove {
     private void editOptions() {
 
         MenuOption colors = new MenuOption("Colors: \t" + (getSettings().color != null ? getSettings().color : "auto"), () -> {
-            Boolean input;
-            try {
-                input = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Colors': "))), "color");
-                getSettings().color = input;
-                System.out.println("Setting updated to " + (input == null ? "auto" : input));
-            } catch (EOFException e) {
-                e.printStackTrace();
-            }
+            Boolean input = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Colors': "))), "color");
+            getSettings().color = input;
+            System.out.println("Setting updated to " + (input == null ? "auto" : input));
         });
 
         MenuOption unicode = new MenuOption("Unicode: \t" + (getSettings().unicode != null ? getSettings().unicode : "auto"), () -> {
-            Boolean input;
-            try {
-                input = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Unicode': "))), "unicode");
-                getSettings().unicode = input;
-                System.out.println("Setting updated to " + (input == null ? "auto" : input));
-            } catch (EOFException e) {
-                e.printStackTrace();
-            }
+            Boolean input = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Unicode': "))), "unicode");
+            getSettings().unicode = input;
+            System.out.println("Setting updated to " + (input == null ? "auto" : input));
         });
 
         MenuOption trace = new MenuOption("Trace: \t" + (getSettings().traceMoves != null ? getSettings().traceMoves : "auto"), () -> {
-            Boolean input;
-            try {
-                input = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Trace': "))), "trace");
-                getSettings().traceMoves = input;
-                System.out.println("Setting updated to " + (input == null ? "auto" : input));
-            } catch (EOFException e) {
-                e.printStackTrace();
-            }
+            Boolean input = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Trace': "))), "trace");
+            getSettings().traceMoves = input;
+            System.out.println("Setting updated to " + (input == null ? "auto" : input));
         });
 
         MenuOption flip = new MenuOption("Flip: \t" + getSettings().flip, () -> {
             boolean input;
-            try {
-                Boolean temp = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Flip': "))), "flip");
-                input = temp != null ? temp : getSettings().flip;
-                getSettings().flip = input;
-                if (temp != null)
-                    System.out.println("Setting updated to " + input);
-                else
-                    System.out.println("Setting was not updated.");
-            } catch (EOFException e) {
-                e.printStackTrace();
-            }
+            Boolean temp = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Flip': "))), "flip");
+            input = temp != null ? temp : getSettings().flip;
+            getSettings().flip = input;
+            if (temp != null)
+                System.out.println("Setting updated to " + input);
+            else
+                System.out.println("Setting was not updated.");
         });
 
         MenuOption debug = new MenuOption("Debug: \t" + getSettings().debug, () -> {
             boolean input;
-            try {
-                Boolean temp = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Debug': "))), "debug");
-                input = temp != null ? temp : getSettings().debug;
-                getSettings().debug = input;
-                if (temp != null)
-                    System.out.println("Setting updated to " + input);
-                else
-                    System.out.println("Setting was not updated.");
-            } catch (EOFException e) {
-                e.printStackTrace();
-            }
+            Boolean temp = ChessMasters.parseTristate(new ArrayList<>(Arrays.asList(IOUtils.promptForString("Enter a new value for 'Debug': "))), "debug");
+            input = temp != null ? temp : getSettings().debug;
+            getSettings().debug = input;
+            if (temp != null)
+                System.out.println("Setting updated to " + input);
+            else
+                System.out.println("Setting was not updated.");
         });
 
         Menu menu = new Menu("What would you like to edit?", colors, unicode, trace, flip, debug)
