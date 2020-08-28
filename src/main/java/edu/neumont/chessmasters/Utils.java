@@ -6,8 +6,8 @@ import edu.neumont.chessmasters.models.pieces.PieceColor;
 import static org.fusesource.jansi.Ansi.ansi;
 
 public class Utils {
-	public static boolean USE_UNICODE = !System.getProperty("os.name").startsWith("Windows");
-	public static boolean USE_ANSI = !System.getProperty("os.name").startsWith("Windows");
+	public static boolean USE_UNICODE = true; //!System.getProperty("os.name").startsWith("Windows");
+	public static boolean USE_ANSI = true; //!System.getProperty("os.name").startsWith("Windows");
 
     public static void clearConsole() {
 		if (USE_ANSI)
