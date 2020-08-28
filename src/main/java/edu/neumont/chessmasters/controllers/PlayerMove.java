@@ -94,11 +94,13 @@ public class PlayerMove {
         this.options = options;
         gameOver = false;
         boolean keepPlaying;
+				helpMenu();
         do {
             keepPlaying = RequestMove();
             if (this.gameOver) {
-                this.flushStatus();
+        Utils.clearConsole();
                 System.out.println("\n" + board.toString(PieceColor.WHITE, options.traceMoves) + "\n");
+                this.flushStatus();
                 return;
             }
         } while (keepPlaying);
@@ -132,6 +134,7 @@ public class PlayerMove {
      * 0. Increment the half-turn counter
      * 1. Clear en passant targets for this player
      * 2. Print board
+		 * 2.0 Print status
      * 2.1 If we're in a stalemate, say so and end the game
      * 3. Do-while(not a valid move or a forfeit):
      * 3.1 Request user input
@@ -150,6 +153,7 @@ public class PlayerMove {
         // 2. Print board
         Utils.clearConsole();
         System.out.println("\n\n" + board.toString(options.flip ? getColor() : PieceColor.WHITE, options.traceMoves));
+				this.flushStatus();
         // 2.1 End-game logic, assuming we have not already reached end-game
         if (!gameOver) {
             // 2.1.1 If we're in a stalemate, say so and end the game
@@ -198,6 +202,7 @@ public class PlayerMove {
                 case "help":
                 case "?":
                     helpMenu();
+										this.flushStatus();
                     continue; // skips rest of loop and asks again for a move
                 case "fen":
                     System.out.println(board.toFEN());
@@ -285,9 +290,8 @@ public class PlayerMove {
                 .append("\n\nTo quit/forfeit the game simply type 'quit' whenever\n")
                 .append("\nEn Passant: When a '*' is displayed, an en passant is possible. This occurs when a pawn takes its initial move two spaces,\n")
                 .append("but could be intercepted by an opposing piece. If the opportunity is not taken, it is lost.\n");
-        //System.out.println(
         setStatus(helper.toString());
-        this.flushStatus();
+        //this.flushStatus();
     }
 
     public void dumpMoveLog() {
@@ -318,6 +322,7 @@ public class PlayerMove {
 
 
     private void editOptions() {
+
         MenuOption colors = new MenuOption("Colors: \t" + (getSettings().color != null ? getSettings().color : "auto"), () -> {
             Boolean input;
             try {
@@ -328,6 +333,7 @@ public class PlayerMove {
                 e.printStackTrace();
             }
         });
+
         MenuOption unicode = new MenuOption("Unicode: \t" + (getSettings().unicode != null ? getSettings().unicode : "auto"), () -> {
             Boolean input;
             try {
@@ -338,6 +344,7 @@ public class PlayerMove {
                 e.printStackTrace();
             }
         });
+
         MenuOption trace = new MenuOption("Trace: \t" + (getSettings().traceMoves != null ? getSettings().traceMoves : "auto"), () -> {
             Boolean input;
             try {
@@ -348,6 +355,7 @@ public class PlayerMove {
                 e.printStackTrace();
             }
         });
+
         MenuOption flip = new MenuOption("Flip: \t" + getSettings().flip, () -> {
             boolean input;
             try {
@@ -362,6 +370,7 @@ public class PlayerMove {
                 e.printStackTrace();
             }
         });
+
         MenuOption debug = new MenuOption("Debug: \t" + getSettings().debug, () -> {
             boolean input;
             try {
