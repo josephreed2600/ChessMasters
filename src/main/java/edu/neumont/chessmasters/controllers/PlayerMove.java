@@ -151,16 +151,22 @@ public class PlayerMove {
         if (!gameOver) {
             // 2.1.1 If we're in a stalemate, say so and end the game
             if (board.checkStalemate(getColor())) {
-                this.setStatus(getColorName() + " has been forced into a stalemate. 1/2-1/2");
+                ChessMasters.increaseWScore(.5);
+                ChessMasters.increaseBScore(.5);
+                this.setStatus(getColorName() + " has been forced into a stalemate." + ChessMasters.getScoreboard());
                 this.setGameOver();
                 return false;
                 // 2.1.2 If the board is in a dead position, say so and end the game.
             } else if (board.isDeadPosition()) {
-                setStatus("DRAW! Checkmate is no longer possible. 1/2-1/2");
+                ChessMasters.increaseWScore(.5);
+                ChessMasters.increaseBScore(.5);
+                setStatus("DRAW! Checkmate is no longer possible." + ChessMasters.getScoreboard());
                 this.setGameOver();
                 return false;
             } else if (board.getMovesSinceCap() >= 50) {
-                setStatus("It has been 50 moves since the last capture or pawn advancement. The game ends in a draw. 1/2-1/2");
+                ChessMasters.increaseWScore(.5);
+                ChessMasters.increaseBScore(.5);
+                setStatus("It has been 50 moves since the last capture or pawn advancement. The game ends in a draw." + ChessMasters.getScoreboard());
                 this.setGameOver();
                 return false;
             }
@@ -179,7 +185,12 @@ public class PlayerMove {
                     System.exit(0); // exits application
                 case "forfeit":
                     // 3.2.1 Execute command
-                    this.setStatus(getColorName() + " has elected to forfeit. " + (isWhite() ? "0-1" : "1-0"));
+                    if(isWhite()) {
+                        ChessMasters.increaseBScore(1);
+                    } else if(isBlack()) {
+                        ChessMasters.increaseWScore(1);
+                    }
+                    this.setStatus(getColorName() + " has elected to forfeit. " + ChessMasters.getScoreboard());
                     this.flushStatus();
                     this.setGameOver();
                     return false; // exits method, indicating game is over

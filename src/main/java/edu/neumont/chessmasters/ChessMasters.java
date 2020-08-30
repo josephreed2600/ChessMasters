@@ -18,6 +18,22 @@ import java.util.List;
 
 public class ChessMasters {
 
+    private static double wScore = 0;
+    private static double bScore = 0;
+    private static String scoreBoard = "Overall Score: White - " + wScore + " Black - " + bScore;
+
+    public static void increaseWScore(double increase) {
+        wScore = wScore + increase;
+    }
+
+    public static void increaseBScore(double increase) {
+        bScore = bScore + increase;
+    }
+
+    public static String getScoreboard() {
+        return scoreBoard;
+    }
+
     public static PlayerMove controller;
 
     public static void executeWrappedJar(String[] args) {

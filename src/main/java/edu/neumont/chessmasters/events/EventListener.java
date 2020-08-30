@@ -60,7 +60,12 @@ public class EventListener {
         boolean checkmate = PlayerMove.inst().getBoard().isInCheckmate(event.getPiece().getColor().getOpposite());
         if (check) {
             if (checkmate) {
-                ChessMasters.controller.setStatus(status + "CHECKMATE! " + (event.getPiece().getColor() == PieceColor.WHITE ? "1-0" : "0-1"));
+                if(event.getPiece().getColor() == PieceColor.WHITE) {
+                    ChessMasters.increaseWScore(1);
+                } else if(event.getPiece().getColor() == PieceColor.BLACK) {
+                    ChessMasters.increaseBScore(1);
+                }       
+                ChessMasters.controller.setStatus(status + "CHECKMATE! " + ChessMasters.getScoreboard());
                 ChessMasters.controller.setGameOver();
             }
         }
