@@ -159,11 +159,11 @@ public class PlayerMove {
                 return false;
                 // 2.1.2 If the board is in a dead position, say so and end the game.
             } else if (board.isDeadPosition()) {
-                setStatus("DRAW! Checkmate is no longer possible.");
+                setStatus("DRAW! Checkmate is no longer possible. 1/2-1/2");
                 this.setGameOver();
                 return false;
             } else if (board.getMovesSinceCap() >= 50) {
-                setStatus("It has been 50 moves since the last capture or pawn advancement. The game ends in a draw");
+                setStatus("It has been 50 moves since the last capture or pawn advancement. The game ends in a draw. 1/2-1/2");
                 this.setGameOver();
                 return false;
             }
