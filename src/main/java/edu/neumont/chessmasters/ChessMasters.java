@@ -20,18 +20,21 @@ public class ChessMasters {
 
     private static double wScore = 0;
     private static double bScore = 0;
-    private static String scoreBoard = "Overall Score: White - " + wScore + " Black - " + bScore;
 
     public static void increaseWScore(double increase) {
         wScore = wScore + increase;
     }
 
-    public static void increaseBScore(double increase) {
-        bScore = bScore + increase;
+    public static int getWScore() {
+        return wScore;
     }
 
-    public static String getScoreboard() {
-        return scoreBoard;
+    public static int getBScore() {
+        return bScore;
+    }
+
+    public static void increaseBScore(double increase) {
+        bScore = bScore + increase;
     }
 
     public static PlayerMove controller;
