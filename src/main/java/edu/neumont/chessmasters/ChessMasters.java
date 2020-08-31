@@ -20,7 +20,6 @@ public class ChessMasters {
 
     private static double wScore = 0;
     private static double bScore = 0;
-    private static String scoreBoard = "Overall Score: White - " + wScore + " Black - " + bScore;
 
     public static void increaseWScore(double increase) {
         wScore = wScore + increase;
@@ -31,7 +30,7 @@ public class ChessMasters {
     }
 
     public static String getScoreboard() {
-        return scoreBoard;
+        return "Overall Score: White - " + wScore + " Black - " + bScore;
     }
 
     public static PlayerMove controller;
