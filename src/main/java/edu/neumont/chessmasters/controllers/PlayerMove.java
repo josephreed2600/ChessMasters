@@ -343,6 +343,7 @@ public class PlayerMove {
 
     public void listSaves() {
         List<File> files = FileUtils.getFiles("saves");
+        System.out.println();
         if (files.size() == 0) System.out.println("No saves.");
         for (int i = 0; i < files.size(); i++) {
             File file = files.get(i);
