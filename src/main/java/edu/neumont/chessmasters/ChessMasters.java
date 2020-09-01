@@ -41,6 +41,7 @@ public class ChessMasters {
         return "Overall Score: White - " + wScore + " Black - " + bScore;
     }
 
+
     public static PlayerMove controller;
 
     public static void executeWrappedJar(String[] args) {
