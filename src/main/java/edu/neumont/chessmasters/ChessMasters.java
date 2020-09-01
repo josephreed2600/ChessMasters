@@ -42,7 +42,6 @@ public class ChessMasters {
     }
 
 
-
     public static PlayerMove controller;
 
     public static void executeWrappedJar(String[] args) {
