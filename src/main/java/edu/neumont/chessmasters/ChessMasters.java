@@ -22,19 +22,19 @@ public class ChessMasters {
     private static double bScore = 0;
 
     public static void increaseWScore(double increase) {
-        wScore = wScore + increase;
+        wScore += increase;
     }
 
-    public static int getWScore() {
+    public static double getWScore() {
         return wScore;
     }
 
-    public static int getBScore() {
+    public static double getBScore() {
         return bScore;
     }
 
     public static void increaseBScore(double increase) {
-        bScore = bScore + increase;
+        bScore += increase;
     }
 
     public static String getScoreboard() {
