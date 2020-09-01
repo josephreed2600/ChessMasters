@@ -149,20 +149,20 @@ public class PlayerMove {
             if (board.checkStalemate(getColor())) {
                 ChessMasters.increaseWScore(.5);
                 ChessMasters.increaseBScore(.5);
-                this.setStatus(getColorName() + " has been forced into a stalemate." + ChessMasters.getScoreboard());
+                this.setStatus(getColorName() + " has been forced into a stalemate. " + ChessMasters.getScoreboard());
                 this.setGameOver();
                 return false;
                 // 2.1.2 If the board is in a dead position, say so and end the game.
             } else if (board.isDeadPosition()) {
                 ChessMasters.increaseWScore(.5);
                 ChessMasters.increaseBScore(.5);
-                setStatus("DRAW! Checkmate is no longer possible." + ChessMasters.getScoreboard());
+                setStatus("DRAW! Checkmate is no longer possible. " + ChessMasters.getScoreboard());
                 this.setGameOver();
                 return false;
             } else if (board.getMovesSinceCap() >= 50) {
                 ChessMasters.increaseWScore(.5);
                 ChessMasters.increaseBScore(.5);
-                setStatus("It has been 50 moves since the last capture or pawn advancement. The game ends in a draw." + ChessMasters.getScoreboard());
+                setStatus("It has been 50 moves since the last capture or pawn advancement. The game ends in a draw. " + ChessMasters.getScoreboard());
                 this.setGameOver();
                 return false;
             }
