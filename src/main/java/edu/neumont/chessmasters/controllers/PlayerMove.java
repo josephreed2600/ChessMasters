@@ -140,9 +140,8 @@ public class PlayerMove {
      * 3.3.2 If either of these fails, continue prompting
      */
     public boolean RequestMove() {
-        int wScore = ChessMasters.getWScore();
-        int bScore = ChessMasters.getBScore();
-        String scoreBoard = "Overall Score: White - " + wScore + " Black - " + bScore;
+
+        String scoreBoard = ChessMasters.getScoreboard();
 
         // 1. Clear en passant targets for this player
         board.clearPassant(getColor());
@@ -157,6 +156,7 @@ public class PlayerMove {
             if (board.checkStalemate(getColor())) {
                 ChessMasters.increaseWScore(.5);
                 ChessMasters.increaseBScore(.5);
+                scoreBoard = ChessMasters.getScoreboard();
                 this.setStatus(getColorName() + " has been forced into a stalemate." + scoreBoard);
                 this.setGameOver();
                 return false;
@@ -164,12 +164,14 @@ public class PlayerMove {
             } else if (board.isDeadPosition()) {
                 ChessMasters.increaseWScore(.5);
                 ChessMasters.increaseBScore(.5);
+                scoreBoard = ChessMasters.getScoreboard();
                 setStatus("DRAW! Checkmate is no longer possible." + scoreBoard);
                 this.setGameOver();
                 return false;
             } else if (board.getMovesSinceCap() >= 50) {
                 ChessMasters.increaseWScore(.5);
                 ChessMasters.increaseBScore(.5);
+                scoreBoard = ChessMasters.getScoreboard();
                 setStatus("It has been 50 moves since the last capture or pawn advancement. The game ends in a draw." + scoreBoard);
                 this.setGameOver();
                 return false;
@@ -194,6 +196,7 @@ public class PlayerMove {
                     } else if(isBlack()) {
                         ChessMasters.increaseWScore(1);
                     }
+                    scoreBoard = ChessMasters.getScoreboard();
                     this.setStatus(getColorName() + " has elected to forfeit. " + scoreBoard);
                     this.flushStatus();
                     this.setGameOver();

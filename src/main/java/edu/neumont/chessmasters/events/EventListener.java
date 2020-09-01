@@ -50,9 +50,7 @@ public class EventListener {
 
     @EventHandler
     public void move(PostPieceMoveEvent event) {
-        int wScore = ChessMasters.getWScore();
-        int bScore = ChessMasters.getBScore();
-        String scoreBoard = "Overall Score: White - " + wScore + " Black - " + bScore;
+        String scoreBoard = ChessMasters.getScoreboard();
         
         if (event.getBoard().isGhostBoard)
             return;
@@ -69,6 +67,7 @@ public class EventListener {
                 } else if(event.getPiece().getColor() == PieceColor.BLACK) {
                     ChessMasters.increaseBScore(1);
                 }       
+                scoreBoard = ChessMasters.getScoreboard();
                 ChessMasters.controller.setStatus(status + "CHECKMATE! " + scoreBoard);
                 ChessMasters.controller.setGameOver();
             }
