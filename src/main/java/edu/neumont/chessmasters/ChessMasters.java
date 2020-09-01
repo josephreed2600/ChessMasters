@@ -37,6 +37,10 @@ public class ChessMasters {
         bScore = bScore + increase;
     }
 
+    public static String getScoreboard() {
+        return "Overall Score: White - " + wScore + " Black - " + bScore;
+    }
+
     public static PlayerMove controller;
 
     public static void executeWrappedJar(String[] args) {

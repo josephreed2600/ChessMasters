@@ -21,15 +21,11 @@ import java.util.List;
 public class PlayerMove {
 
 
-
-
-
     private        Board        board;
     private static PlayerMove   inst;
     private        String       status = null;
     private        boolean      gameOver;
     private        GameSettings options;
-
 
 
     public String getColorName() {
@@ -189,9 +185,9 @@ public class PlayerMove {
                     System.exit(0); // exits application
                 case "forfeit":
                     // 3.2.1 Execute command
-                    if(isWhite()) {
+                    if (isWhite()) {
                         ChessMasters.increaseBScore(1);
-                    } else if(isBlack()) {
+                    } else if (isBlack()) {
                         ChessMasters.increaseWScore(1);
                     }
                     this.setStatus(getColorName() + " has elected to forfeit. " + scoreBoard);
@@ -320,9 +316,6 @@ public class PlayerMove {
             String slot = IOUtils.promptForString("Name this save:");
 
 
-
-
-
             new File("saves").mkdir();
 
             if (slot.equalsIgnoreCase("list")) {
@@ -352,9 +345,20 @@ public class PlayerMove {
 
     }
 
+    public void listSaves() {
+        List<File> files = FileUtils.getFiles("saves");
+        if (files.size() == 0) System.out.println("No saves.");
+        for (int i = 0; i < files.size(); i++) {
+            File file = files.get(i);
+            System.out.println((i + 1) + ". " + file.getName().replace(".chess", ""));
+        }
+    }
 
     public void loadGame() {
         boolean loaded = false;
+
+        listSaves();
+
         do {
             String slot = IOUtils.promptForString("Which save should we load?");
             if (slot.equalsIgnoreCase("exit") || slot.equalsIgnoreCase("quit")) {
@@ -362,12 +366,7 @@ public class PlayerMove {
             }
 
             if (slot.equalsIgnoreCase("list")) {
-                List<File> files = FileUtils.getFiles("saves");
-                if (files.size() == 0) System.out.println("No saves.");
-                for (int i = 0; i < files.size(); i++) {
-                    File file = files.get(i);
-                    System.out.println((i + 1) + ". " + file.getName().replace(".chess", ""));
-                }
+                listSaves();
             } else if (new File("saves" + File.separator + slot + ".chess").exists() && !FileUtils.readFileFully("saves" + File.separator + slot + ".chess").isEmpty()) {
                 System.out.println("Loading game...");
                 String boardFen = FileUtils.readFileFully("saves" + File.separator + slot + ".chess");
