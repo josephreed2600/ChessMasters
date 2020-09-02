@@ -18,6 +18,30 @@ import java.util.List;
 
 public class ChessMasters {
 
+    private static double wScore = 0;
+    private static double bScore = 0;
+
+    public static void increaseWScore(double increase) {
+        wScore += increase;
+    }
+
+    public static double getWScore() {
+        return wScore;
+    }
+
+    public static double getBScore() {
+        return bScore;
+    }
+
+    public static void increaseBScore(double increase) {
+        bScore += increase;
+    }
+
+    public static String getScoreboard() {
+        return "Overall Score: White - " + wScore + " Black - " + bScore;
+    }
+
+
     public static PlayerMove controller;
 
     public static void executeWrappedJar(String[] args) {

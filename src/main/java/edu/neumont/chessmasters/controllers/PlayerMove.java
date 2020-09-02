@@ -21,15 +21,11 @@ import java.util.List;
 public class PlayerMove {
 
 
-
-
-
     private        Board        board;
     private static PlayerMove   inst;
     private        String       status = null;
     private        boolean      gameOver;
     private        GameSettings options;
-
 
 
     public String getColorName() {
@@ -151,16 +147,22 @@ public class PlayerMove {
         if (!gameOver) {
             // 2.1.1 If we're in a stalemate, say so and end the game
             if (board.checkStalemate(getColor())) {
-                this.setStatus(getColorName() + " has been forced into a stalemate. 1/2-1/2");
+                ChessMasters.increaseWScore(.5);
+                ChessMasters.increaseBScore(.5);
+                this.setStatus(getColorName() + " has been forced into a stalemate. " + ChessMasters.getScoreboard());
                 this.setGameOver();
                 return false;
                 // 2.1.2 If the board is in a dead position, say so and end the game.
             } else if (board.isDeadPosition()) {
-                setStatus("DRAW! Checkmate is no longer possible. 1/2-1/2");
+                ChessMasters.increaseWScore(.5);
+                ChessMasters.increaseBScore(.5);
+                setStatus("DRAW! Checkmate is no longer possible. " + ChessMasters.getScoreboard());
                 this.setGameOver();
                 return false;
             } else if (board.getMovesSinceCap() >= 50) {
-                setStatus("It has been 50 moves since the last capture or pawn advancement. The game ends in a draw. 1/2-1/2");
+                ChessMasters.increaseWScore(.5);
+                ChessMasters.increaseBScore(.5);
+                setStatus("It has been 50 moves since the last capture or pawn advancement. The game ends in a draw. " + ChessMasters.getScoreboard());
                 this.setGameOver();
                 return false;
             }
@@ -179,7 +181,12 @@ public class PlayerMove {
                     System.exit(0); // exits application
                 case "forfeit":
                     // 3.2.1 Execute command
-                    this.setStatus(getColorName() + " has elected to forfeit. " + (isWhite() ? "0-1" : "1-0"));
+                    if (isWhite()) {
+                        ChessMasters.increaseBScore(1);
+                    } else if (isBlack()) {
+                        ChessMasters.increaseWScore(1);
+                    }
+                    this.setStatus(getColorName() + " has elected to forfeit. " + ChessMasters.getScoreboard());
                     this.flushStatus();
                     this.setGameOver();
                     return false; // exits method, indicating game is over
@@ -305,9 +312,6 @@ public class PlayerMove {
             String slot = IOUtils.promptForString("Name this save:");
 
 
-
-
-
             new File("saves").mkdir();
 
             if (slot.equalsIgnoreCase("list")) {
@@ -337,9 +341,21 @@ public class PlayerMove {
 
     }
 
+    public void listSaves() {
+        List<File> files = FileUtils.getFiles("saves");
+        System.out.println();
+        if (files.size() == 0) System.out.println("No saves.");
+        for (int i = 0; i < files.size(); i++) {
+            File file = files.get(i);
+            System.out.println((i + 1) + ". " + file.getName().replace(".chess", ""));
+        }
+    }
 
     public void loadGame() {
         boolean loaded = false;
+
+        listSaves();
+
         do {
             String slot = IOUtils.promptForString("Which save should we load?");
             if (slot.equalsIgnoreCase("exit") || slot.equalsIgnoreCase("quit")) {
@@ -347,12 +363,7 @@ public class PlayerMove {
             }
 
             if (slot.equalsIgnoreCase("list")) {
-                List<File> files = FileUtils.getFiles("saves");
-                if (files.size() == 0) System.out.println("No saves.");
-                for (int i = 0; i < files.size(); i++) {
-                    File file = files.get(i);
-                    System.out.println((i + 1) + ". " + file.getName().replace(".chess", ""));
-                }
+                listSaves();
             } else if (new File("saves" + File.separator + slot + ".chess").exists() && !FileUtils.readFileFully("saves" + File.separator + slot + ".chess").isEmpty()) {
                 System.out.println("Loading game...");
                 String boardFen = FileUtils.readFileFully("saves" + File.separator + slot + ".chess");
